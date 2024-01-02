@@ -1,8 +1,8 @@
 ﻿@page "/manage-repertoires/{IdCinema:int}/{CinemaName}"
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
+@inject IAlertService AlertService
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -27,6 +27,7 @@
                     <MudTh>Day Number</MudTh>
                     <MudTh>Month</MudTh>
                     <MudTh>Year</MudTh>
+                    <MudTh>Actions</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Day">@context.Date.DayOfWeek</MudTd>
@@ -132,11 +133,11 @@
         }
         else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Such repertoire already exists");
+            AlertService.DisplayAlert("Such repertoire already exists, try again", Severity.Error);
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add repertoire, try again");
+            AlertService.DisplayAlert("Couldn't add repertoire, try again", Severity.Error);
         }
     }
 
@@ -150,11 +151,11 @@
         }
         else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Such repertoire already exists");
+            AlertService.DisplayAlert("Such repertoire already exists, try again", Severity.Error);
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update repertoire, try again");
+            AlertService.DisplayAlert("Couldn't update repertoire, try again", Severity.Error);
         }
     }
     private async Task DeleteRepertoireAsync(int id)
@@ -166,7 +167,7 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete repertoire, try again");
+            AlertService.DisplayAlert("Couldn't delete repertoire, try again", Severity.Error);
         }
     }
 

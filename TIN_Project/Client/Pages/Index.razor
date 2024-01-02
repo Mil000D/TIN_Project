@@ -1,6 +1,5 @@
 ﻿@page "/"
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 <MudProgressCircular Indeterminate="true" />
@@ -13,6 +12,6 @@
     {
         _cinemas = await HttpClient.GetFromJsonAsync<List<GetCinemaDTO>>("api/cinemas");
         _cinema = _cinemas.FirstOrDefault();
-        NavigationManager.NavigateTo($"/cinema-repertoire/{_cinema.IdCinema}");
+        NavigationManager.NavigateTo($"/cinema-repertoire/{_cinema.IdCinema}/{_cinema.Name}");
     }
 }

@@ -38,5 +38,19 @@ namespace TIN_Project.Server.Mappers.UserMappers
         {
             return users.Select(user => MapUserToGetUserDTO(user)).ToList();
         }
+
+        public User MapAddAdminDTOToUser(AddAdminDTO addAdminDTO, Role role)
+        {
+            return new User
+            {
+                Username = addAdminDTO.Username,
+                Password = addAdminDTO.Password,
+                Email = addAdminDTO.Email,
+                Name = addAdminDTO.Name,
+                Surname = addAdminDTO.Surname,
+                BirthDate = DateOnly.FromDateTime((DateTime)addAdminDTO.BirthDate),
+                Role = role
+            };
+        }
     }
 }

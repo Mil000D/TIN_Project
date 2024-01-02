@@ -2,7 +2,6 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IJSRuntime JSRuntime
 
 <MudThemeProvider @ref="@mudThemeProvider" Theme="myCustomTheme" />
 <MudDialogProvider />
@@ -128,7 +127,7 @@
             return;
         }
         Cinema = cinema;
-        NavigationManager.NavigateTo($"/cinema-repertoire/{cinema.IdCinema}");
+        NavigationManager.NavigateTo($"/cinema-repertoire/{cinema.IdCinema}/{cinema.Name}");
     }
 
     private Func<GetCinemaDTO, string> converter = c => c?.Name;

@@ -1,0 +1,47 @@
+﻿@page "/add-admin"
+@attribute [Authorize(Roles = "Superuser")]
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IAlertService AlertService
+
+<EditForm Model="@_addAdminDTO" OnValidSubmit="@HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <MudCard Elevation="20" Style="min-width: 400px;">
+        <MudCardContent>
+            <MudTextField Label="Username" @bind-Value="_addAdminDTO.Username" For="@(() => _addAdminDTO.Username)" />
+            <MudTextField Label="Password" @bind-Value="_addAdminDTO.Password" For="@(() => _addAdminDTO.Password)" InputType="InputType.Password"/>
+            <MudTextField Label="E-mail" @bind-Value="_addAdminDTO.Email" For="@(() => _addAdminDTO.Email)" />
+            <MudTextField Label="Name" @bind-Value="_addAdminDTO.Name" For="@(() => _addAdminDTO.Name)" />
+            <MudTextField Label="Surname" @bind-Value="_addAdminDTO.Surname" For="@(() => _addAdminDTO.Surname)" />
+            <MudDatePicker Label="Date of birth" @bind-Date="_addAdminDTO.BirthDate" For="@(() => _addAdminDTO.BirthDate)" />
+            <MudText Color="Color.Error">@_errorMessage</MudText>
+        </MudCardContent>
+        <MudCardActions Class="justify-center">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+    @code {
+    private AddAdminDTO _addAdminDTO = new AddAdminDTO();
+    private string _errorMessage;
+    private async Task HandleValidSubmitAsync()
+    {
+        var response = await HttpClient.PostAsJsonAsync("api/users/admin", _addAdminDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/manage-users");
+        }
+        else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            _errorMessage = "Such username already exists, try again";
+            AlertService.DisplayAlert(_errorMessage, Severity.Error);
+        }
+        else
+        {
+            _errorMessage = "Something went wrong, try again";
+            AlertService.DisplayAlert(_errorMessage, Severity.Error);
+        }
+    }
+
+}

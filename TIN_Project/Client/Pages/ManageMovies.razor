@@ -2,7 +2,7 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
+@inject IAlertService AlertService
 
 <MudContainer Class="d-flex justify-center" >
     <MudStack>
@@ -76,13 +76,12 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete movie, try again");
+            AlertService.DisplayAlert("Couldn't delete movie, try again", Severity.Error);
         }
     }
     private void AddMovie()
     {
         NavigationManager.NavigateTo($"/add-movie/");
-
     }
     private void UpdateMovie(int id)
     {

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TIN_Project.Server.Enums;
 using TIN_Project.Server.Mappers.UserMappers;
 using TIN_Project.Server.Services.UsersServices;
+using TIN_Project.Shared.DTOs.UserDTOs;
 
 namespace TIN_Project.Server.Controllers.Users
 {
@@ -22,6 +24,35 @@ namespace TIN_Project.Server.Controllers.Users
         {
             var users = await _usersDbService.GetAllUsersAsync();
             return Ok(_mapper.MapUsersToGetUserDTOs(users));
+        }
+        [HttpPost("admin")]
+        public async Task<IActionResult> AddAdminAsync([FromBody] AddAdminDTO addAdminDTO)
+        {
+            var user = await _usersDbService.GetUserByPredicateAsync(x => x.Username == addAdminDTO.Username);
+            if (user != null)
+            {
+                return Conflict();
+            }
+            else
+            {
+                var userFromDTO = _mapper.MapAddAdminDTOToUser(addAdminDTO, Role.Admin);
+                await _usersDbService.AddUserAsync(userFromDTO);
+                return Ok();
+            }
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserAsync(int id)
+        {
+            var user = await _usersDbService.GetUserByPredicateAsync(x => x.IdUser == id && id != 1);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                await _usersDbService.DeleteUserAsync(user);
+                return Ok();
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿@page "/manage-genres"
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
+@inject IAlertService AlertService
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -87,11 +87,11 @@
         }
         else if(responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Genre already exists");
+            AlertService.DisplayAlert("Such genre already exists, try again", Severity.Error);
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update genre, try again");
+            AlertService.DisplayAlert("Couldn't update genre, try again", Severity.Error);
         }
     }
     private async Task AddGenreAsync()
@@ -104,11 +104,11 @@
         }
         else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Genre already exists");
+            AlertService.DisplayAlert("Such genre already exists, try again", Severity.Error);
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add genre, try again");
+            AlertService.DisplayAlert("Couldn't add genre, try again", Severity.Error);
         }
     }
 
@@ -134,7 +134,7 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete genre, try again");
+            AlertService.DisplayAlert("Couldn't delete genre, try again", Severity.Error);
         }
     }
     private void OpenUpdateGenreDialog(int id)

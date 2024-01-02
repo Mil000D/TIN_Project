@@ -1,8 +1,8 @@
 ﻿@page "/manage-users"
 @attribute [Authorize(Roles = "Superuser")]
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
+@inject IAlertService AlertService
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -16,7 +16,7 @@
         else if (_users.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Severity="Severity.Info">No cinemas</MudAlert>
+                <MudAlert Severity="Severity.Info">No users</MudAlert>
             </div>
         }
         else
@@ -29,6 +29,7 @@
                     <MudTh>Surname</MudTh>
                     <MudTh>Birth date</MudTh>
                     <MudTh>Is admin?</MudTh>
+                    <MudTh>Actions</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Username">@context.Username</MudTd>
@@ -38,9 +39,7 @@
                     <MudTd DataLabel="Birth date">@context.BirthDate</MudTd>
                     <MudTd DataLabel="Is admin?">@context.IsAdmin</MudTd>
                     <MudTd DataLabel="Actions">
-                        <MudButton Style="background-color: #2196F3; color: white;" //@onclick="@(() => OpenUpdateCinemaDialog(context.IdCinema))">Update</MudButton>
-                        <MudButton Style="background-color: red; color: white;" //@onclick=@(() => DeleteCinemaAsync(context.IdCinema))>Delete</MudButton>
-                        <MudButton Style="background-color: #2196F3; color: white;" //@onclick="@(() => ManageRepertoires(context.IdCinema, context.Name))">Manage repertoire</MudButton>
+                        <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteUserAsync(context.IdUser))>Delete</MudButton>
                     </MudTd>
                 </RowTemplate>
                 <PagerContent>
@@ -50,7 +49,7 @@
                 </PagerContent>
             </MudTable>
         }
-        <MudButton Style="background-color: #2196F3; color: white;" //@onclick="AddCinema">Add cinema</MudButton>
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="AddAdmin">Add admin</MudButton>
     </MudStack>
 </MudContainer>
 
@@ -69,5 +68,21 @@
     private void PageChanged(int i)
     {
         _table.NavigateTo(i - 1);
+    }
+    private void AddAdmin()
+    {
+        NavigationManager.NavigateTo("/add-admin");
+    }
+    private async Task DeleteUserAsync(int id)
+    {
+        var response = await HttpClient.DeleteAsync($"api/users/{id}");
+        if(response.IsSuccessStatusCode)
+        {
+            await GetUsersAsync();
+        }
+        else
+        {
+            AlertService.DisplayAlert("Couldn't delete user, try again", Severity.Error);
+        }
     }
 }

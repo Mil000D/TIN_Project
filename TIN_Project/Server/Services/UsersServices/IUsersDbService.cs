@@ -7,5 +7,6 @@ namespace TIN_Project.Server.Services.UsersServices
         public Task AddUserAsync(User user);
         public Task<User?> GetUserByPredicateAsync(Expression<Func<User, bool>> predicate);
         public Task<List<User>> GetAllUsersAsync();
+        public Task DeleteUserAsync(User user);
     }
 }

@@ -1,6 +1,6 @@
 ﻿@page "/register"
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
+@inject IAlertService AlertService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -58,6 +58,7 @@
         else
         {
             _errorMessage = "Such username already exists, try again";
+            AlertService.DisplayAlert(_errorMessage, Severity.Error);
         }
     }
 

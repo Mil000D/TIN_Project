@@ -1,8 +1,8 @@
 ﻿@page "/manage-cinemas"
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
+@inject IAlertService AlertService
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -25,6 +25,7 @@
                 <HeaderContent>
                     <MudTh>Name</MudTh>
                     <MudTh>Address</MudTh>
+                    <MudTh>Actions</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                         <MudTd DataLabel="Name">@context.Name</MudTd>
@@ -93,7 +94,7 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete cinema, try again");
+            AlertService.DisplayAlert("Couldn't delete cinema, try again", Severity.Error);
         }
     }
     private void AddCinema()
@@ -111,7 +112,7 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update cinema, try again");
+            AlertService.DisplayAlert("Couldn't update cinema, try again", Severity.Error);
         }
     }
     private void OpenUpdateCinemaDialog(int id)

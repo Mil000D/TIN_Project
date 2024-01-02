@@ -1,7 +1,7 @@
 ﻿@page "/update-movie/{IdMovie:int}"
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
+@inject IAlertService AlertService
 @inject NavigationManager NavigationManager
 
 @if (_updateMovieDTO == null)
@@ -59,7 +59,7 @@ else
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update movie try again");
+            AlertService.DisplayAlert("Couldn't update movie try again", Severity.Error);
         }
     }
     private Func<GenreDTO, string> converter = g => g?.Name;

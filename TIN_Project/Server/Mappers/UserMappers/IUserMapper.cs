@@ -8,6 +8,7 @@ namespace TIN_Project.Server.Mappers.UserMappers
         public User MapRegisterUserDTOToUser(RegisterUserDTO userDTO, Role role);
         public GetUserDTO MapUserToGetUserDTO(User user);
         public List<GetUserDTO> MapUsersToGetUserDTOs(List<User> users);
+        public User MapAddAdminDTOToUser(AddAdminDTO addAdminDTO, Role role);
 
     }
 }

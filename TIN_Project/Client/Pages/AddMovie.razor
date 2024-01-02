@@ -1,7 +1,7 @@
 ﻿@page "/add-movie"
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
+@inject IAlertService AlertService
 @inject NavigationManager NavigationManager
 
 <EditForm Model="@_addMovieDTO" OnValidSubmit="@HandleValidSubmitAsync">
@@ -45,7 +45,7 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add movie, try again");
+            AlertService.DisplayAlert("Couldn't add movie, try again", Severity.Error);
         }
     }
     private Func<GenreDTO, string> converter = g => g?.Name;

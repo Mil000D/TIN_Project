@@ -26,5 +26,10 @@ namespace TIN_Project.Server.Services.UsersServices
         {
             return await _context.Users.Where(u => u.IdUser != 1).ToListAsync();
         }
+        public Task DeleteUserAsync(User user)
+        {
+            _context.Users.Remove(user);
+            return _context.SaveChangesAsync();
+        }
     }
 }

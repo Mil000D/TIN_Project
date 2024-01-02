@@ -1,4 +1,4 @@
-﻿@page "/cinema-repertoire/{IdCinema:int}"
+﻿@page "/cinema-repertoire/{IdCinema:int}/{CinemaName}"
 @inject HttpClient HttpClient
 
 @if(_repertoires == null)
@@ -11,20 +11,25 @@ else if(_repertoires.Count == 0)
 }
 else
 {
-    <MudContainer Style="width:100%; height:100%;">
+    <div class="d-flex flex-column">
         <MudSelect Style="max-width:200px;" T="GetRepertoireDTO" Label="Repertoire" ToStringFunc="@converter" @bind-Value="_repertoire" Variant="Variant.Filled">
             @foreach (var repertoire in _repertoires)
             {
                 <MudSelectItem Value="@repertoire">@repertoire.Date.Day.@repertoire.Date.Month.@repertoire.Date.Year - @repertoire.Date.DayOfWeek</MudSelectItem>
             }
         </MudSelect>
+        <MudPaper Elevation="20" Class="pa-2 mb-4">
+            <MudText Typo="Typo.h2">@CinemaName</MudText>
+        </MudPaper>
         <Movies IdRepertoire="_repertoire.IdRepertoire" IdCinema="IdCinema"></Movies>
-    </MudContainer>
+    </div>
 }
 
 @code {
     [Parameter]
     public int IdCinema { get; set; }
+    [Parameter]
+    public string CinemaName { get; set; }
     private List<GetRepertoireDTO>? _repertoires;
     private GetRepertoireDTO _repertoire = new GetRepertoireDTO();
     protected override async Task OnInitializedAsync()

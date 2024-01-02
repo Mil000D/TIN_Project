@@ -1,8 +1,8 @@
 ﻿@page "/manage-movies-repertoire/{IdCinema:int}/{IdRepertoire:int}"
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient HttpClient
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
+@inject IAlertService AlertService
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -29,6 +29,7 @@
                     <MudTh>Show Time</MudTh>
                     <MudTh>Cinema Name</MudTh>
                     <MudTh>Cinema Address</MudTh>
+                    <MudTh>Actions</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Poster"><MudImage Src="@context.PosterUrl" Width="70" Height="100"></MudImage></MudTd>
@@ -153,11 +154,11 @@
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "This movie's repertoire already exists");
+            AlertService.DisplayAlert("Such movie's repertoire already exists, try again", Severity.Error);
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add movie's repertoire, try again");
+            AlertService.DisplayAlert("Couldn't add movie's repertoire, try again", Severity.Error);
         }
     }
     private async Task DeleteMoviesRepertoireAsync(int id)
@@ -169,7 +170,7 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete movie's repertoire, try again");
+            AlertService.DisplayAlert("Couldn't delete movie's repertoire, try again", Severity.Error);
         }
     }
 
@@ -186,11 +187,11 @@
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "This movie's repertoire already exists");
+            AlertService.DisplayAlert("Such movie's repertoire already exists, try again", Severity.Error);
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update movie's repertoire, try again");
+            AlertService.DisplayAlert("Couldn't update movie's repertoire, try again", Severity.Error);
         }
     }
     private Func<GetMovieDTO, string> converter = g => g?.Title;
