@@ -1,0 +1,177 @@
+﻿@page "/manage-repertoires/{IdCinema:int}/{CinemaName}"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<MudContainer Class="d-flex justify-center">
+    <MudStack>
+        <MudText Align="Align.Center" Typo="Typo.h4">Manage Repertoires for @CinemaName</MudText>
+        @if (_repertoires == null)
+        {
+            <div class="d-flex justify-center">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_repertoires.Count() == 0)
+        {
+            <div class="d-flex justify-center">
+                <MudAlert Severity="Severity.Info">No repertoires</MudAlert>
+            </div>
+        }
+        else
+        {
+            <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_repertoires" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Day</MudTh>
+                    <MudTh>Day Number</MudTh>
+                    <MudTh>Month</MudTh>
+                    <MudTh>Year</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Day">@context.Date.DayOfWeek</MudTd>
+                        <MudTd DataLabel="Day Number">@context.Date.Day</MudTd>
+                        <MudTd DataLabel="Month">@context.Date.Month</MudTd>
+                        <MudTd DataLabel="Year">@context.Date.Year</MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => OpenUpdateRepertoireDialog(context.IdRepertoire))">Update</MudButton>
+                        <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteRepertoireAsync(context.IdRepertoire))>Delete</MudButton>
+                        <MudButton Style="background-color: #2196F3; color: white;" @onclick=@(() => ManageMoviesRepertoire(context.IdRepertoire))>Manage movies repertoire</MudButton>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <div class="d-flex justify-center">
+                        <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4" />
+                    </div>
+                </PagerContent>
+                </MudTable>
+        }
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick ="OpenAddRepertoireDialog">Add repertoire</MudButton>
+    </MudStack>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_isUpdateRepertoireDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update repertoire
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudDatePicker Label="Date of repertoire" @bind-Date="_currentUpdateRepertoire.Date" For="@(() => _currentUpdateRepertoire.Date)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateRepertoireAsync" Class="px-10">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="_isAddRepertoireDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Add repertoire
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudDatePicker Label="Date of repertoire" @bind-Date="_currentAddRepertoire.Date" For="@(() => _currentAddRepertoire.Date)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddRepertoireAsync" Class="px-10">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Parameter]
+    public int IdCinema { get; set; }
+    [Parameter]
+    public string CinemaName { get; set; }
+    private bool _isUpdateRepertoireDialogVisible = false;
+    private bool _isAddRepertoireDialogVisible = false;
+    private DialogOptions _dialogOptions = new() { FullWidth = true };
+    private MudTable<GetRepertoireDTO> _table;
+    private IEnumerable<GetRepertoireDTO>? _repertoires;
+    private AddRepertoireDTO _currentAddRepertoire = new AddRepertoireDTO();
+    private UpdateRepertoireDTO _currentUpdateRepertoire = new UpdateRepertoireDTO();
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRepertoiresAsync();
+    }
+
+    private async Task GetRepertoiresAsync()
+    {
+        _repertoires = await HttpClient.GetFromJsonAsync<List<GetRepertoireDTO>>($"api/repertoires/{IdCinema}");
+    }
+
+    private void OpenAddRepertoireDialog()
+    {
+        _isAddRepertoireDialogVisible = true;
+        _currentAddRepertoire = new AddRepertoireDTO();
+    }
+
+    private void OpenUpdateRepertoireDialog(int id)
+    {
+        _isUpdateRepertoireDialogVisible = true;
+        var repertoire = _repertoires.FirstOrDefault(x=> x.IdRepertoire == id);
+        _currentUpdateRepertoire = new UpdateRepertoireDTO
+        {
+            IdRepertoire = repertoire.IdRepertoire,
+            Date = repertoire.Date,
+            IdCinema = IdCinema
+        };
+    }
+
+    private async Task AddRepertoireAsync()
+    {
+        _isAddRepertoireDialogVisible = false;
+        _currentAddRepertoire.IdCinema = IdCinema;
+        var responseHTTP = await HttpClient.PostAsJsonAsync($"/api/repertoires/{IdCinema}", _currentAddRepertoire);
+        if (responseHTTP.IsSuccessStatusCode)
+        {
+            await GetRepertoiresAsync();
+        }
+        else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Such repertoire already exists");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add repertoire, try again");
+        }
+    }
+
+    private async Task UpdateRepertoireAsync()
+    {
+        _isUpdateRepertoireDialogVisible = false;
+        var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/repertoires", _currentUpdateRepertoire);
+        if (responseHTTP.IsSuccessStatusCode)
+        {
+            await GetRepertoiresAsync();
+        }
+        else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Such repertoire already exists");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update repertoire, try again");
+        }
+    }
+    private async Task DeleteRepertoireAsync(int id)
+    {
+        var response = await HttpClient.DeleteAsync($"api/repertoires/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await GetRepertoiresAsync();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete repertoire, try again");
+        }
+    }
+
+    private void ManageMoviesRepertoire(int id)
+    {
+        NavigationManager.NavigateTo($"/manage-movies-repertoire/{IdCinema}/{id}");
+    }
+}

@@ -1,0 +1,44 @@
+﻿@page "/cinema-repertoire/{IdCinema:int}"
+@inject HttpClient HttpClient
+
+@if(_repertoires == null)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if(_repertoires.Count == 0)
+{
+    <MudAlert Severity="Severity.Info">No repertoires</MudAlert>
+}
+else
+{
+    <MudContainer Style="width:100%; height:100%;">
+        <MudSelect Style="max-width:200px;" T="GetRepertoireDTO" Label="Repertoire" ToStringFunc="@converter" @bind-Value="_repertoire" Variant="Variant.Filled">
+            @foreach (var repertoire in _repertoires)
+            {
+                <MudSelectItem Value="@repertoire">@repertoire.Date.Day.@repertoire.Date.Month.@repertoire.Date.Year - @repertoire.Date.DayOfWeek</MudSelectItem>
+            }
+        </MudSelect>
+        <Movies IdRepertoire="_repertoire.IdRepertoire" IdCinema="IdCinema"></Movies>
+    </MudContainer>
+}
+
+@code {
+    [Parameter]
+    public int IdCinema { get; set; }
+    private List<GetRepertoireDTO>? _repertoires;
+    private GetRepertoireDTO _repertoire = new GetRepertoireDTO();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRepertoiresAsync();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetRepertoiresAsync();
+    }
+    private async Task GetRepertoiresAsync()
+    {
+        _repertoires = await HttpClient.GetFromJsonAsync<List<GetRepertoireDTO>>($"api/repertoires/{IdCinema}");
+        _repertoire = _repertoires.FirstOrDefault();
+    }
+    private Func<GetRepertoireDTO, string> converter = g => $"{g.Date.Day}.{g.Date.Month}.{g.Date.Year} - {g.Date.DayOfWeek}";
+}

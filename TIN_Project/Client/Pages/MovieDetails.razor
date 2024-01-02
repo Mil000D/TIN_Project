@@ -1,0 +1,95 @@
+﻿@page "/movie-details/{IdCinema:int}/{IdRepertoire:int}/{IdMovie:int}/{ShowTime}"
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+@if(Movie == null)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <MudContainer>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                <MudCard Elevation="20">
+                    <MudCardContent Class="justify-center">
+                        <MudText Typo="Typo.h4">@Movie.Title</MudText>
+                        <MudCardMedia Class="mt-2" Image="@Movie.PosterUrl" Height="400" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="8" lg="9">
+                <MudCard Elevation="20">
+                    <MudCardContent>
+                        <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                            <MudText Typo="Typo.h6">Genres :</MudText>
+                            <MudText Typo="Typo.body2">@string.Join(", ", Movie.Genres.Select(elem => elem.Name))</MudText>
+                        </div>
+                        <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                            <MudText Typo="Typo.h6">Description :</MudText>
+                            <MudText Typo="Typo.body2">@Movie.Description</MudText>
+                        </div>
+                        <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                            <MudStack Row="true" Class="align-center">
+                                <MudText Typo="Typo.h6">Play trailer</MudText>
+                                <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.PlayArrow" Size="Size.Medium" @onclick="() => _isTrailerDialogVisible = true" />
+                            </MudStack>
+                        </div>
+                        <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                            <MudText Typo="Typo.h6">Show time :</MudText>
+                            <MudText Typo="Typo.body2">@ShowTime @Movie.Date.Day.@Movie.Date.Month.@Movie.Date.Year</MudText>
+                        </div>
+                        <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                            <MudText Typo="Typo.h6">Cinema address :</MudText>
+                            <MudText Typo="Typo.body2">@Movie.CinemaName - @Movie.CinemaAddress</MudText>
+                        </div>
+                        <div class="d-flex justify-center pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                            <MudStack Row="true" Class="align-center" Spacing="5">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" //@onclick ="() =>">Buy tickets</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" //@onclick ="() => ">Book tickets</MudButton>
+                            </MudStack>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+}
+=
+<MudDialog @bind-IsVisible="_isTrailerDialogVisible" Options="_dialogOptions">
+    <TitleContent>Trailer For @Movie?.Title</TitleContent>
+    <DialogContent>
+        <div style="width:900px;height:500px;">
+            <iframe src="@GetVideoEmbeddedLink()" allowfullscreen></iframe>
+        </div>
+    </DialogContent>
+</MudDialog>
+@code {
+    [Parameter]
+    public int IdMovie { get; set; }
+    [Parameter]
+    public int IdRepertoire { get; set; }
+    [Parameter]
+    public int IdCinema { get; set; }
+    [Parameter]
+    public string ShowTime { get; set; }
+    private bool _isTrailerDialogVisible = false;
+    private DialogOptions _dialogOptions = new() { FullWidth=true, MaxWidth=MaxWidth.Medium };
+    protected override async Task OnInitializedAsync()
+    {
+        await GetMovieDetailsAsync();
+    }
+    private GetMovieDetailsDTO? Movie { get; set; }
+    private async Task GetMovieDetailsAsync()
+    {
+        Movie = await HttpClient.GetFromJsonAsync<GetMovieDetailsDTO>($"api/moviesrepertoires/details?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}&IdMovie={IdMovie}");
+    }
+
+    private string GetVideoEmbeddedLink()
+    {
+        var uri = new Uri(Movie.TrailerUrl);
+        var query = HttpUtility.ParseQueryString(uri.Query);
+        var videoId = query["v"];
+        return $"https://www.youtube.com/embed/{videoId}";
+    }
+}

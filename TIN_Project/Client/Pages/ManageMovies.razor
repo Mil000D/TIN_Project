@@ -1,0 +1,93 @@
+﻿@page "/manage-movies"
+@attribute [Authorize(Roles = "Admin")]
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+
+<MudContainer Class="d-flex justify-center" >
+    <MudStack>
+        <MudText Align="Align.Center" Typo="Typo.h4">Manage Movies</MudText>
+        @if (_movies == null)
+        {
+            <div class="d-flex justify-center">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_movies.Count() == 0)
+        {
+            <div class="d-flex justify-center">
+                <MudAlert Severity="Severity.Info">No movies</MudAlert>
+            </div>
+        }
+        else
+        {
+            <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_movies" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Poster</MudTh>
+                    <MudTh>Title</MudTh>
+                    <MudTh>Genres</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Poster"><MudImage Src="@context.PosterUrl" Width="70" Height="100"></MudImage></MudTd>
+                    <MudTd DataLabel="Title">@context.Title</MudTd>
+                    <MudTd DataLabel="Genres">@string.Join(", ", context.Genres.Select(elem => elem.Name))</MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => UpdateMovie(context.IdMovie))">Update</MudButton>
+                        <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteMovieAsync(context.IdMovie))>Delete</MudButton>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <div class="d-flex justify-center">
+                            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4" />
+                    </div>
+                </PagerContent>
+            </MudTable>
+        }
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OnAddMovieClick">Add movie</MudButton>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private MudTable<GetMovieDTO> _table;
+    private IEnumerable<GetMovieDTO>? _movies;
+    private void OnAddMovieClick()
+    {
+        NavigationManager.NavigateTo("/add-movie");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await GetMoviesAsync();
+    }
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+    private async Task GetMoviesAsync()
+    {
+        _movies = await HttpClient.GetFromJsonAsync<List<GetMovieDTO>>("api/movies");
+    }
+    private async Task DeleteMovieAsync(int id)
+    {
+        var response = await HttpClient.DeleteAsync($"api/movies/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await GetMoviesAsync();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete movie, try again");
+        }
+    }
+    private void AddMovie()
+    {
+        NavigationManager.NavigateTo($"/add-movie/");
+
+    }
+    private void UpdateMovie(int id)
+    {
+        NavigationManager.NavigateTo($"/update-movie/{id}");
+    }
+
+   
+}

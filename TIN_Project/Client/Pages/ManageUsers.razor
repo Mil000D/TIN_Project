@@ -1,0 +1,73 @@
+﻿@page "/manage-users"
+@attribute [Authorize(Roles = "Superuser")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<MudContainer Class="d-flex justify-center">
+    <MudStack>
+        <MudText Align="Align.Center" Typo="Typo.h4">Manage Users</MudText>
+        @if (_users == null)
+        {
+            <div class="d-flex justify-center">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_users.Count() == 0)
+        {
+            <div class="d-flex justify-center">
+                <MudAlert Severity="Severity.Info">No cinemas</MudAlert>
+            </div>
+        }
+        else
+        {
+            <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_users" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Username</MudTh>
+                    <MudTh>Email</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Surname</MudTh>
+                    <MudTh>Birth date</MudTh>
+                    <MudTh>Is admin?</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Username">@context.Username</MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Surname">@context.Surname</MudTd>
+                    <MudTd DataLabel="Birth date">@context.BirthDate</MudTd>
+                    <MudTd DataLabel="Is admin?">@context.IsAdmin</MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudButton Style="background-color: #2196F3; color: white;" //@onclick="@(() => OpenUpdateCinemaDialog(context.IdCinema))">Update</MudButton>
+                        <MudButton Style="background-color: red; color: white;" //@onclick=@(() => DeleteCinemaAsync(context.IdCinema))>Delete</MudButton>
+                        <MudButton Style="background-color: #2196F3; color: white;" //@onclick="@(() => ManageRepertoires(context.IdCinema, context.Name))">Manage repertoire</MudButton>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <div class="d-flex justify-center">
+                        <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4" />
+                    </div>
+                </PagerContent>
+            </MudTable>
+        }
+        <MudButton Style="background-color: #2196F3; color: white;" //@onclick="AddCinema">Add cinema</MudButton>
+    </MudStack>
+</MudContainer>
+
+
+@code {
+    private MudTable<GetUserDTO> _table;
+    private List<GetUserDTO> _users;
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUsersAsync();
+    }
+    private async Task GetUsersAsync()
+    {
+        _users = await HttpClient.GetFromJsonAsync<List<GetUserDTO>>("api/users");
+    }
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+}

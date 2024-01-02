@@ -1,0 +1,128 @@
+﻿@page "/manage-cinemas"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<MudContainer Class="d-flex justify-center">
+    <MudStack>
+        <MudText Align="Align.Center" Typo="Typo.h4">Manage Cinemas</MudText>
+        @if (_cinemas == null)
+        {
+            <div class="d-flex justify-center">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_cinemas.Count() == 0)
+        {
+            <div class="d-flex justify-center">
+                <MudAlert Severity="Severity.Info">No cinemas</MudAlert>
+            </div>
+        }
+        else
+        {
+            <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_cinemas" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Address</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Address">@context.Address</MudTd>
+                        <MudTd DataLabel="Actions">
+                            <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => OpenUpdateCinemaDialog(context.IdCinema))">Update</MudButton>
+                            <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteCinemaAsync(context.IdCinema))>Delete</MudButton>
+                            <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => ManageRepertoires(context.IdCinema, context.Name))">Manage repertoire</MudButton>
+                        </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <div class="d-flex justify-center">
+                        <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4" />
+                    </div>
+                </PagerContent>
+            </MudTable>
+        }
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="AddCinema">Add cinema</MudButton>
+    </MudStack>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_isUpdateCinemaDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update cinema
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Label="Name" @bind-Value="@_currentCinema.Name" For="@(() => _currentCinema.Name)" />
+        <MudTextField Label="Address" @bind-Value="@_currentCinema.Address" For="@(() => _currentCinema.Address)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateCinemaAsync" Class="px-10">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MainLayout Parent { get; set; }
+
+    private DialogOptions _dialogOptions = new() { FullWidth = true };
+    private MudTable<GetCinemaDTO> _table;
+    private IEnumerable<GetCinemaDTO>? _cinemas;
+    private bool _isUpdateCinemaDialogVisible = false;
+    private UpdateCinemaDTO? _currentCinema = new UpdateCinemaDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCinemasAsync();
+    }
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+    private async Task GetCinemasAsync()
+    {
+        _cinemas = await HttpClient.GetFromJsonAsync<List<GetCinemaDTO>>("api/cinemas");
+    }
+    private async Task DeleteCinemaAsync(int id)
+    {
+        var response = await HttpClient.DeleteAsync($"api/cinemas/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await GetCinemasAsync();
+            await Parent.RefreshCinemasAsync();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete cinema, try again");
+        }
+    }
+    private void AddCinema()
+    {
+        NavigationManager.NavigateTo($"/add-cinema/");
+    }
+    private async Task UpdateCinemaAsync()
+    {
+        _isUpdateCinemaDialogVisible = false;
+        var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/cinemas", _currentCinema);
+        if (responseHTTP.IsSuccessStatusCode)
+        {
+            await GetCinemasAsync();
+            await Parent.RefreshCinemasAsync();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update cinema, try again");
+        }
+    }
+    private void OpenUpdateCinemaDialog(int id)
+    {
+        var cinema = _cinemas.FirstOrDefault(x => x.IdCinema == id);
+        _currentCinema = new UpdateCinemaDTO { IdCinema = cinema.IdCinema, Name = cinema.Name, Address = cinema.Address };
+        _isUpdateCinemaDialogVisible = true;
+    }
+
+    private void ManageRepertoires(int id, string cinemaName)
+    {
+        NavigationManager.NavigateTo($"/manage-repertoires/{id}/{cinemaName}");
+    }
+}

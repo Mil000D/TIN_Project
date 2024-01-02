@@ -1,0 +1,41 @@
+﻿@page "/add-cinema"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+
+<EditForm Model="@_addCinemaDTO" OnValidSubmit="@HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <MudCard Elevation="20" Style="min-width: 400px;">
+        <MudCardContent>
+            <MudTextField Label="Name" @bind-Value="_addCinemaDTO.Name" For="@(() => _addCinemaDTO.Name)" />
+            <MudTextField Label="Address" @bind-Value="_addCinemaDTO.Address" For="@(() => _addCinemaDTO.Address)" />
+        </MudCardContent>
+        <MudCardActions Class="justify-center">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    [CascadingParameter]
+    public MainLayout Parent { get; set; }
+
+    private AddCinemaDTO _addCinemaDTO = new AddCinemaDTO();
+
+    private async Task HandleValidSubmitAsync()
+    {
+        var response = await HttpClient.PostAsJsonAsync("api/cinemas", _addCinemaDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/manage-cinemas");
+            await Parent.RefreshCinemasAsync();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add cinema, try again");
+        }
+    }
+}
+

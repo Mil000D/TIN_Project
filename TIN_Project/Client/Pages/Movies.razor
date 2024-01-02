@@ -1,0 +1,62 @@
+﻿@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+@if (_movies == null)
+{
+	<div class="d-flex justify-center">
+		<MudProgressCircular Indeterminate="true" />
+	</div>
+}
+else if (_movies.Count() == 0)
+{
+	<div class="d-flex justify-center">
+		<MudAlert Severity="Severity.Info">No movies</MudAlert>
+	</div>
+}
+else
+{
+	<div class ="gap-4 d-flex flex-wrap">
+		@foreach (var movie in _movies)
+		{
+			<MudCard Elevation="20" Style="width:290px;">
+				<MudCardMedia Image="@movie.PosterUrl" Height="400" />
+				<MudCardContent Style="min-height:150px;">
+					<MudText Typo="Typo.h6">@movie.Title</MudText>
+					<MudText Typo="Typo.body2">Genres : @string.Join(", ", movie.Genres.Select(elem => elem.Name))</MudText>
+				</MudCardContent>
+				<MudCardActions Style="min-height:100px;">
+					<MudContainer Class="gap-4 d-flex flex-wrap">
+						@foreach (var showTime in movie.ShowTimes)
+						{
+							<MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => NavigateToMovieDetails(movie.IdMovie, showTime))">@showTime</MudButton>
+						}
+					</MudContainer>
+				</MudCardActions>
+			</MudCard>
+		}
+	</div>
+}
+
+@code {
+	[Parameter]
+	public int IdRepertoire { get; set; }
+	[Parameter]
+	public int IdCinema { get; set; }
+	private List<GetMovieWithShowTimesDTO>? _movies;
+	protected override async Task OnInitializedAsync()
+    {
+		await GetMoviesAsync();
+    }
+	protected override async Task OnParametersSetAsync()
+    {
+        await GetMoviesAsync();
+    }
+	private async Task GetMoviesAsync()
+    {
+        _movies = await HttpClient.GetFromJsonAsync<List<GetMovieWithShowTimesDTO>>($"api/moviesrepertoires/showtimes/{IdRepertoire}");
+    }
+	private void NavigateToMovieDetails(int idMovie, TimeOnly showTime)
+    {
+		NavigationManager.NavigateTo($"/movie-details/{IdCinema}/{IdRepertoire}/{idMovie}/{showTime}");
+    }
+}

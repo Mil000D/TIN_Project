@@ -1,0 +1,68 @@
+﻿@page "/update-movie/{IdMovie:int}"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+@if (_updateMovieDTO == null)
+{
+    <div class="d-flex justify-center">
+        <MudProgressCircular Indeterminate="true" />
+    </div>
+}
+else
+{
+    <EditForm Model="@_updateMovieDTO" OnValidSubmit="@HandleValidSubmitAsync">
+        <DataAnnotationsValidator />
+        <MudCard Elevation="20" Style="min-width: 400px;">
+            <MudCardContent>
+                <MudTextField Label="Title" @bind-Value="_updateMovieDTO.Title" For="@(() => _updateMovieDTO.Title)" />
+                <MudTextField Label="Poster URL" @bind-Value="_updateMovieDTO.PosterUrl" For="@(() => _updateMovieDTO.PosterUrl)" />
+                <MudTextField Label="Trailer URL" @bind-Value="_updateMovieDTO.TrailerUrl" For="@(() => _updateMovieDTO.TrailerUrl)" />
+                <MudTextField Label="Description" @bind-Value="_updateMovieDTO.Description" For="@(() => _updateMovieDTO.Description)" Lines="4" />
+                <MudSelect T="GenreDTO" Label="Genres" ToStringFunc="@converter" MultiSelection="true" @bind-Value="_genre" @bind-SelectedValues="_genresToUpdate">
+                    @foreach (var genre in _genres)
+                    {
+                        <MudSelectItem Value="@genre">@genre.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudCardContent>
+            <MudCardActions Class="justify-center">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int IdMovie { get; set; }
+    private UpdateMovieDTO _updateMovieDTO = new UpdateMovieDTO();
+    private IEnumerable<GenreDTO> _genresToUpdate;
+    private IEnumerable<GenreDTO> _genres = new List<GenreDTO>();
+    private GenreDTO _genre = new GenreDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _updateMovieDTO = await HttpClient.GetFromJsonAsync<UpdateMovieDTO>($"api/movies/{IdMovie}");
+        _genres = await HttpClient.GetFromJsonAsync<IEnumerable<GenreDTO>>("api/genres");
+        _genresToUpdate = _updateMovieDTO.Genres.ToList();
+    }
+    private async Task HandleValidSubmitAsync()
+    {
+        _updateMovieDTO.IdMovie = IdMovie;
+        _updateMovieDTO.Genres = _genresToUpdate.ToList();
+        var response = await HttpClient.PutAsJsonAsync("api/movies", _updateMovieDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/manage-movies");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update movie try again");
+        }
+    }
+    private Func<GenreDTO, string> converter = g => g?.Name;
+
+
+}

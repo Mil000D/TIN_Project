@@ -1,0 +1,142 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+
+<MudThemeProvider @ref="@mudThemeProvider" Theme="myCustomTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+        <MudAppBar Elevation="1">
+            <MudSelect @ref="_select" ValueChanged="@((value) => OnCinemaChanged(value))" Style="max-width:200px; background-color:white;" T="GetCinemaDTO" Label="Cinemas" ToStringFunc="@converter" Value="Cinema" Variant="Variant.Filled" Margin="Margin.Dense">
+                @foreach (var cinema in Cinemas)
+                {
+                    <MudSelectItem Value="@cinema">@cinema.Name - @cinema.Address</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSpacer/>
+            <AuthorizeView>
+                <NotAuthorized>
+                    @if (NavigationManager.Uri.Contains("/login"))
+                    {
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" @onclick="@OnRegisterClick">Register</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" @onclick="@OnLoginClick">Login</MudButton>
+                    }
+                </NotAuthorized>
+                <Authorized>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Info" @onclick="@OnLogoutClick">Logout</MudButton>
+                </Authorized>
+            </AuthorizeView>
+        </MudAppBar>
+    <AuthorizeView Roles="Admin, Customer">
+        <Authorized>
+            <MudDrawer @bind-Open="@open" ClipMode="DrawerClipMode.Always" OpenMiniOnHover="true" Elevation="1" Variant="DrawerVariant.Mini">
+                <AuthorizeView Roles="Admin" Context="innerContext">
+                    <MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Info" Class="pa-2">
+                        <MudNavLink Href="@("/manage-movies")" Icon="@Icons.Material.Filled.MovieCreation">
+                                Manage Movies
+                        </MudNavLink>
+                        <MudNavLink Href="@("/manage-genres")" Icon="@Icons.Material.Filled.AddToPhotos">
+                            Manage Genres
+                            </MudNavLink>
+                        <MudNavLink Href="@("/manage-cinemas")" Icon="@Icons.Material.Filled.CameraIndoor">
+                            Manage Cinemas
+                        </MudNavLink>
+                        <AuthorizeView Roles="Superuser" Context="innerInnerContext">
+                            <MudNavLink Href="@("/manage-users")" Icon="@Icons.Material.Filled.Person">
+                                Manage Users
+                            </MudNavLink>
+                        </AuthorizeView>
+                    </MudNavMenu>
+                </AuthorizeView>
+            </MudDrawer>
+        </Authorized>
+    </AuthorizeView>
+    <MudMainContent>
+        <MudPaper Class="d-flex justify-center align-center ma-2" MinHeight="90vh" Elevation="1">
+            <CascadingValue Value="this">
+                @Body
+            </CascadingValue>
+        </MudPaper>
+    </MudMainContent>
+</MudLayout>
+@code
+{
+    private MudSelect<GetCinemaDTO> _select;
+    private bool _ignoreValueChanged = false;
+    public bool open = false;
+    MudTheme myCustomTheme = new MudTheme()
+            {
+                Palette = new PaletteLight()
+                {
+                    Primary = "#2196F3",
+                    TextPrimary = "#2196F3",
+                    AppbarBackground = "#2196F3",
+                    Background = "#2196F3",
+                    TextSecondary = "#2196F3",
+                },
+                LayoutProperties = new LayoutProperties()
+                {
+                    DrawerMiniWidthLeft = "72px",
+                }
+            };
+
+    private MudThemeProvider mudThemeProvider = null!;
+
+    private GetCinemaDTO Cinema { get; set; } = new GetCinemaDTO();
+    private List<GetCinemaDTO> Cinemas { get; set; } = new List<GetCinemaDTO>();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCinemasAsync();
+    }
+    private async Task GetCinemasAsync()
+    {
+        Cinemas = await HttpClient.GetFromJsonAsync<List<GetCinemaDTO>>("api/cinemas");
+        Cinema = Cinemas.FirstOrDefault();
+    }
+    private void OnLoginClick()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+
+    private void OnRegisterClick()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+    private async Task OnLogoutClick()
+    {
+        var response = await HttpClient.PostAsync("api/authentication/logout", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            ((UserAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser();
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private void OnCinemaChanged(GetCinemaDTO cinema)
+    {
+        if (_ignoreValueChanged)
+        {
+            _ignoreValueChanged = false;
+            return;
+        }
+        Cinema = cinema;
+        NavigationManager.NavigateTo($"/cinema-repertoire/{cinema.IdCinema}");
+    }
+
+    private Func<GetCinemaDTO, string> converter = c => c?.Name;
+
+    public async Task RefreshCinemasAsync()
+    {
+        _ignoreValueChanged = true;
+        await GetCinemasAsync();
+        await _select.ForceUpdate();
+    }
+}

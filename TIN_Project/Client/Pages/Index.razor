@@ -1,0 +1,18 @@
+﻿@page "/"
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<MudProgressCircular Indeterminate="true" />
+
+
+@code {
+    private GetCinemaDTO _cinema = new GetCinemaDTO();
+    private List<GetCinemaDTO> _cinemas = new List<GetCinemaDTO>();
+    protected override async Task OnInitializedAsync()
+    {
+        _cinemas = await HttpClient.GetFromJsonAsync<List<GetCinemaDTO>>("api/cinemas");
+        _cinema = _cinemas.FirstOrDefault();
+        NavigationManager.NavigateTo($"/cinema-repertoire/{_cinema.IdCinema}");
+    }
+}

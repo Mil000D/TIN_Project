@@ -1,0 +1,151 @@
+﻿@page "/manage-genres"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+
+<MudContainer Class="d-flex justify-center">
+    <MudStack>
+        <MudText Align="Align.Center" Typo="Typo.h4">Manage Genres</MudText>
+        @if (_genres == null)
+        {
+            <div class="d-flex justify-center">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_genres.Count() == 0)
+        {
+            <div class="d-flex justify-center">
+                <MudAlert Severity="Severity.Info">No genres</MudAlert>
+            </div>
+        }
+        else
+        {
+        <MudTable @ref="@_table" Items="@_genres" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => OpenUpdateGenreDialog(context.IdGenre))">Update</MudButton>
+                    <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteGenreAsync(context.IdGenre))>Delete</MudButton>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4" />
+            </PagerContent>
+        </MudTable>
+        }
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OpenAddGenreDialog">Add genre</MudButton>
+    </MudStack>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_isUpdateGenreDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update genre
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Label="Name of genre" @bind-Value="@_currentGenre.Name" For="@(() => _currentGenre.Name)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateGenreAsync" Class="px-10">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="_isAddGenreDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Add genre
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Label="Name of genre" @bind-Value="@_currentGenre.Name" For="@(() => _currentGenre.Name)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddGenreAsync" Class="px-10">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool _isUpdateGenreDialogVisible = false;
+    private bool _isAddGenreDialogVisible = false;
+    private DialogOptions _dialogOptions = new() { FullWidth = true };
+    private MudTable<GenreDTO> _table;
+    private IEnumerable<GenreDTO>? _genres;
+    private GenreDTO? _currentGenre = new GenreDTO();
+
+    private async Task UpdateGenreAsync()
+    {
+        _isUpdateGenreDialogVisible = false;
+        var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/genres", _currentGenre);
+        if(responseHTTP.IsSuccessStatusCode)
+        {
+            await GetGenresAsync();
+        }
+        else if(responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Genre already exists");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update genre, try again");
+        }
+    }
+    private async Task AddGenreAsync()
+    {
+        _isAddGenreDialogVisible = false;
+        var responseHTTP = await HttpClient.PostAsJsonAsync($"/api/genres", _currentGenre);
+        if (responseHTTP.IsSuccessStatusCode)
+        {
+            await GetGenresAsync();
+        }
+        else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Genre already exists");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add genre, try again");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGenresAsync();
+    }
+    private async Task GetGenresAsync()     
+    {
+        _genres = await HttpClient.GetFromJsonAsync<List<GenreDTO>>("api/genres");
+    }
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+
+    private async Task DeleteGenreAsync(int id)
+    {
+        var responseHTTP = await HttpClient.DeleteAsync($"/api/genres/{id}");
+        if (responseHTTP.IsSuccessStatusCode)
+        {
+            await GetGenresAsync();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete genre, try again");
+        }
+    }
+    private void OpenUpdateGenreDialog(int id)
+    {
+        var genre = _genres.FirstOrDefault(x => x.IdGenre == id);
+        _currentGenre = new GenreDTO { IdGenre = genre.IdGenre, Name = genre.Name };
+        _isUpdateGenreDialogVisible = true;
+    }
+    private void OpenAddGenreDialog()
+    {
+        _currentGenre = new GenreDTO();
+        _isAddGenreDialogVisible = true;
+    }
+}

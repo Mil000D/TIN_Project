@@ -1,0 +1,52 @@
+﻿@page "/add-movie"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<EditForm Model="@_addMovieDTO" OnValidSubmit="@HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <MudCard Elevation="20" Style="min-width: 400px;">
+        <MudCardContent>
+            <MudTextField Label="Title" @bind-Value="_addMovieDTO.Title" For="@(() => _addMovieDTO.Title)" />
+            <MudTextField Label="Poster URL" @bind-Value="_addMovieDTO.PosterUrl" For="@(() => _addMovieDTO.PosterUrl)" />
+            <MudTextField Label="Trailer URL" @bind-Value="_addMovieDTO.TrailerUrl" For="@(() => _addMovieDTO.TrailerUrl)" />
+            <MudTextField Label="Description" @bind-Value="_addMovieDTO.Description" For="@(() => _addMovieDTO.Description)" Lines="4" />
+            <MudSelect T="GenreDTO" Label="Genres" ToStringFunc="@converter" MultiSelection="true" @bind-Value="Genre" @bind-SelectedValues="_genresToUpdate">
+                @foreach (var genre in _genres)
+                {
+                    <MudSelectItem Value="@genre">@genre.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudCardContent>
+        <MudCardActions Class="justify-center">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    private AddMovieDTO _addMovieDTO { get; set; } = new AddMovieDTO();
+    private IEnumerable<GenreDTO> _genresToUpdate;
+    private IEnumerable<GenreDTO> _genres = new List<GenreDTO>();
+    private GenreDTO Genre { get; set; } = new GenreDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _genres = await HttpClient.GetFromJsonAsync<IEnumerable<GenreDTO>>("api/genres");
+    }
+    private async Task HandleValidSubmitAsync()
+    {
+        _addMovieDTO.Genres = _genresToUpdate.ToList();
+        var response = await HttpClient.PostAsJsonAsync("api/movies", _addMovieDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/manage-movies");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add movie, try again");
+        }
+    }
+    private Func<GenreDTO, string> converter = g => g?.Name;
+}

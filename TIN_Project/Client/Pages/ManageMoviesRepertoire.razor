@@ -1,0 +1,197 @@
+﻿@page "/manage-movies-repertoire/{IdCinema:int}/{IdRepertoire:int}"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<MudContainer Class="d-flex justify-center">
+    <MudStack>
+        <MudText Align="Align.Center" Typo="Typo.h4">Manage Movies' Repertoires</MudText>
+        @if (_moviesrepertoires == null)
+        {
+            <div class="d-flex justify-center">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_moviesrepertoires.Count() == 0)
+        {
+            <div class="d-flex justify-center">
+                <MudAlert Severity="Severity.Info">No movies' repertoires</MudAlert>
+            </div>
+        }
+        else
+        {
+            <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_moviesrepertoires" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Poster</MudTh>
+                    <MudTh>Title</MudTh>
+                    <MudTh>Date</MudTh>
+                    <MudTh>Show Time</MudTh>
+                    <MudTh>Cinema Name</MudTh>
+                    <MudTh>Cinema Address</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Poster"><MudImage Src="@context.PosterUrl" Width="70" Height="100"></MudImage></MudTd>
+                    <MudTd DataLabel="Title">@context.Title</MudTd>
+                        <MudTd DataLabel="Date">@context.Date.Day.@context.Date.Month.@context.Date.Year</MudTd>
+                        <MudTd DataLabel="Show Time">@context.ShowTime</MudTd>
+                        <MudTd DataLabel="Cinema Name">@context.CinemaName</MudTd>
+                        <MudTd DataLabel="Cinema Address">@context.CinemaAddress</MudTd>
+                        <MudTd DataLabel="Actions">
+                            <MudButton Style="background-color: #2196F3; color: white;" @onclick ="@(() => OpenUpdateMoviesRepertoireDialog(context.IdMoviesRepertoire))">Update</MudButton>
+                            <MudButton Style="background-color: red; color: white;" @onclick =@(() => DeleteMoviesRepertoireAsync(context.IdMoviesRepertoire))>Delete</MudButton>
+                        </MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <div class="d-flex justify-center">
+                            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4" />
+                        </div>
+                    </PagerContent>
+                </MudTable>
+        }
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OpenAddMoviesRepertoireDialog">Add repertoire</MudButton>
+    </MudStack>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_isAddMoviesRepertoireDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Add movie's repertoire
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTimePicker Label="Show time" Orientation="Orientation.Landscape" @bind-Time="_time" />
+        <MudSelect T="GetMovieDTO" Label="Movie" ToStringFunc="@converter" @bind-Value="_movie">
+            @foreach (var movie in _movies)
+            {
+                <MudSelectItem Value="@movie">@movie.Title</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddMoviesRepertoireAsync" Class="px-10">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="_isUpdateMoviesRepertoireDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update movie's repertoire
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTimePicker Label="Show time" Orientation="Orientation.Landscape" @bind-Time="_time" />
+        <MudSelect T="GetMovieDTO" Label="Movie" ToStringFunc="@converter" @bind-Value="_movie">
+            @foreach (var movie in _movies)
+            {
+                <MudSelectItem Value="@movie">@movie.Title</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateMoviesRepertoireAsync" Class="px-10">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Parameter]
+    public int IdCinema { get; set; }
+    [Parameter]
+    public int IdRepertoire { get; set; }
+    private bool _isAddMoviesRepertoireDialogVisible = false;
+    private bool _isUpdateMoviesRepertoireDialogVisible = false;
+    private DialogOptions _dialogOptions = new() { FullWidth = true };
+    private MudTable<GetMoviesRepertoireDTO> _table;
+    private IEnumerable<GetMoviesRepertoireDTO>? _moviesrepertoires;
+    private TimeSpan? _time = new TimeSpan(21, 37, 00);
+    private IEnumerable<GetMovieDTO> _movies = new List<GetMovieDTO>();
+    private GetMovieDTO _movie = new GetMovieDTO();
+    private AddMoviesRepertoireDTO _addMoviesRepertoireDTO = new AddMoviesRepertoireDTO();
+    private UpdateMoviesRepertoireDTO _updateMoviesRepertoireDTO = new UpdateMoviesRepertoireDTO();
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await GetMoviesRepertoiresAsync();
+    }
+    private async Task GetMoviesRepertoiresAsync()
+    {
+        _movies = await HttpClient.GetFromJsonAsync<IEnumerable<GetMovieDTO>>("api/movies");
+        _moviesrepertoires = await HttpClient.GetFromJsonAsync<IEnumerable<GetMoviesRepertoireDTO>>($"api/moviesrepertoires?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}");
+    }
+
+    private void OpenAddMoviesRepertoireDialog()
+    {
+        _isAddMoviesRepertoireDialogVisible = true;
+        _addMoviesRepertoireDTO = new AddMoviesRepertoireDTO();
+        _movie = new GetMovieDTO();
+    }
+
+    private void OpenUpdateMoviesRepertoireDialog(int idMoviesRepertoire)
+    {
+        _isUpdateMoviesRepertoireDialogVisible = true;
+        _updateMoviesRepertoireDTO = new UpdateMoviesRepertoireDTO
+        {
+             IdMoviesRepertoire = idMoviesRepertoire
+        };
+        _movie = _movies.FirstOrDefault(x => x.IdMovie == _moviesrepertoires.FirstOrDefault(x => x.IdMoviesRepertoire == idMoviesRepertoire).IdMovie);
+        _time = _moviesrepertoires.FirstOrDefault(x => x.IdMoviesRepertoire == idMoviesRepertoire).ShowTime.ToTimeSpan();
+    }
+
+    private async Task AddMoviesRepertoireAsync()
+    {
+        _isAddMoviesRepertoireDialogVisible = false;
+        _addMoviesRepertoireDTO.IdRepertoire = IdRepertoire;
+        _addMoviesRepertoireDTO.IdMovie = _movie.IdMovie;
+        _addMoviesRepertoireDTO.ShowTime = TimeOnly.FromTimeSpan((TimeSpan)_time);
+        var response = await HttpClient.PostAsJsonAsync("api/moviesrepertoires", _addMoviesRepertoireDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            await GetMoviesRepertoiresAsync();
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "This movie's repertoire already exists");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't add movie's repertoire, try again");
+        }
+    }
+    private async Task DeleteMoviesRepertoireAsync(int id)
+    {
+        var response = await HttpClient.DeleteAsync($"api/moviesrepertoires/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await GetMoviesRepertoiresAsync();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't delete movie's repertoire, try again");
+        }
+    }
+
+    private async Task UpdateMoviesRepertoireAsync()
+    {
+        _isUpdateMoviesRepertoireDialogVisible = false;
+        _updateMoviesRepertoireDTO.IdMovie = _movie.IdMovie;
+        _updateMoviesRepertoireDTO.IdRepertoire = IdRepertoire;
+        _updateMoviesRepertoireDTO.ShowTime = TimeOnly.FromTimeSpan((TimeSpan)_time);
+        var response = await HttpClient.PutAsJsonAsync($"api/moviesrepertoires", _updateMoviesRepertoireDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            await GetMoviesRepertoiresAsync();
+        }
+        else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "This movie's repertoire already exists");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Couldn't update movie's repertoire, try again");
+        }
+    }
+    private Func<GetMovieDTO, string> converter = g => g?.Title;
+}
