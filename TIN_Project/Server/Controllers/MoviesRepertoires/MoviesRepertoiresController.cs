@@ -79,7 +79,7 @@ namespace TIN_Project.Server.Controllers.MoviesRepertoires
         [HttpPost]
         public async Task<IActionResult> AddMoviesRepertoireAsync([FromBody] AddMoviesRepertoireDTO addMoviesRepertoireDTO)
         {
-            if (!await _moviesRepertoiresDbService.IsMovieShowTimeUnique(addMoviesRepertoireDTO))
+            if (!await _moviesRepertoiresDbService.IsMovieShowTimeUniqueAsync(addMoviesRepertoireDTO))
             {
                 return Conflict();
             }
@@ -114,7 +114,7 @@ namespace TIN_Project.Server.Controllers.MoviesRepertoires
             {
                 return NotFound();
             }
-            else if(!await _moviesRepertoiresDbService.IsMovieShowTimeUnique(updateMoviesRepertoireDTO))
+            else if(!await _moviesRepertoiresDbService.IsMovieShowTimeUniqueAsync(updateMoviesRepertoireDTO))
             {
 				return Conflict();
 			}

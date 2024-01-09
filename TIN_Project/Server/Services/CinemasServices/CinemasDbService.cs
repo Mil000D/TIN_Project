@@ -38,6 +38,18 @@ namespace TIN_Project.Server.Services.CinemasServices
             cinemaToUpdate.Address = cinemaDTO.Address;
             await _context.SaveChangesAsync();
         }
-
+        public async Task<List<Cinema>> GetCinemasByRepertoiresAsync(List<Repertoire> repertoires)
+        {
+            var cinemas = new List<Cinema>();
+            foreach (var repertoire in repertoires)
+            {
+                var cinema = await _context.Cinemas.FirstOrDefaultAsync(x => x.IdCinema == repertoire.IdCinema);
+                if (cinema != null)
+                {
+                    cinemas.Add(cinema);
+                }
+            }
+            return cinemas;
+        }
     }
 }

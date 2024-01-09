@@ -28,31 +28,32 @@
                     }
                 </NotAuthorized>
                 <Authorized>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Info" @onclick="@OnLogoutClick">Logout</MudButton>
+                    <AuthorizeView Roles="Admin, Customer" Context="innerContext">
+                        <MudButton Class="mr-2" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Person" Color="Color.Info" @onclick="@OnProfileClick">Profile</MudButton>
+                    </AuthorizeView>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Info" @onclick="@OnLogoutClickAsync">Logout</MudButton>
                 </Authorized>
             </AuthorizeView>
         </MudAppBar>
-    <AuthorizeView Roles="Admin, Customer">
+    <AuthorizeView Roles="Admin">
         <Authorized>
             <MudDrawer @bind-Open="@open" ClipMode="DrawerClipMode.Always" OpenMiniOnHover="true" Elevation="1" Variant="DrawerVariant.Mini">
-                <AuthorizeView Roles="Admin" Context="innerContext">
-                    <MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Info" Class="pa-2">
-                        <MudNavLink Href="@("/manage-movies")" Icon="@Icons.Material.Filled.MovieCreation">
-                                Manage Movies
+                <MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Info" Class="pa-2">
+                    <MudNavLink Href="@("/manage-movies")" Icon="@Icons.Material.Filled.MovieCreation">
+                            Manage Movies
+                    </MudNavLink>
+                    <MudNavLink Href="@("/manage-genres")" Icon="@Icons.Material.Filled.AddToPhotos">
+                        Manage Genres
                         </MudNavLink>
-                        <MudNavLink Href="@("/manage-genres")" Icon="@Icons.Material.Filled.AddToPhotos">
-                            Manage Genres
-                            </MudNavLink>
-                        <MudNavLink Href="@("/manage-cinemas")" Icon="@Icons.Material.Filled.CameraIndoor">
-                            Manage Cinemas
+                    <MudNavLink Href="@("/manage-cinemas")" Icon="@Icons.Material.Filled.CameraIndoor">
+                        Manage Cinemas
+                    </MudNavLink>
+                    <AuthorizeView Roles="Superuser" Context="innerContext">
+                        <MudNavLink Href="@("/manage-users")" Icon="@Icons.Material.Filled.Person">
+                            Manage Users
                         </MudNavLink>
-                        <AuthorizeView Roles="Superuser" Context="innerInnerContext">
-                            <MudNavLink Href="@("/manage-users")" Icon="@Icons.Material.Filled.Person">
-                                Manage Users
-                            </MudNavLink>
-                        </AuthorizeView>
-                    </MudNavMenu>
-                </AuthorizeView>
+                    </AuthorizeView>
+                </MudNavMenu>
             </MudDrawer>
         </Authorized>
     </AuthorizeView>
@@ -108,7 +109,7 @@
         NavigationManager.NavigateTo("/register");
     }
 
-    private async Task OnLogoutClick()
+    private async Task OnLogoutClickAsync()
     {
         var response = await HttpClient.PostAsync("api/authentication/logout", null);
 
@@ -118,7 +119,10 @@
             NavigationManager.NavigateTo("/");
         }
     }
-
+    private void OnProfileClick()
+    {
+        NavigationManager.NavigateTo("/profile");
+    }
     private void OnCinemaChanged(GetCinemaDTO cinema)
     {
         if (_ignoreValueChanged)

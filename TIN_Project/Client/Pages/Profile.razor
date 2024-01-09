@@ -1,0 +1,206 @@
+﻿@page "/profile"
+@attribute [Authorize(Roles = "Admin, Customer")]
+@inject HttpClient HttpClient
+@inject IAlertService AlertService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthorizationService AuthorizationService
+
+@if (_user == null)
+{
+	<div class="d-flex justify-center">
+		<MudProgressCircular Indeterminate="true" />
+	</div>
+}
+else
+{
+    <MudStack>
+    <MudContainer MaxWidth="MaxWidth.Small">
+    <MudStack>
+        <EditForm Model="@_user" OnValidSubmit="HandleValidSubmitAsync">
+        <DataAnnotationsValidator />
+	        <MudPaper Elevation="20" Class="pa-2 mb-2 mt-2">
+		        <MudText Typo="Typo.h2">Welcome @_user.Username</MudText>
+	        </MudPaper>
+            <MudCard Elevation="20" Class="mb-4">
+                <MudCardContent>
+                    <div class="pa-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                        <MudText Typo="Typo.h6">Your username :</MudText>
+                        <MudTextField @bind-Value="_user.Username" For="@(() => _user.Username)" />
+                    </div>
+                    <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                        <MudText Typo="Typo.h6">Your e-mail :</MudText>
+                        <MudTextField @bind-Value="_user.Email" For="@(() => _user.Email)" />
+                    </div>
+                    <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                        <MudText Typo="Typo.h6">Your name :</MudText>
+                        <MudTextField @bind-Value="_user.Name" For="@(() => _user.Name)" />
+                    </div>
+                    <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                        <MudText Typo="Typo.h6">Your surname :</MudText>
+                        <MudTextField @bind-Value="_user.Surname" For="@(() => _user.Surname)" />
+                    </div>
+                    <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                        <MudText Typo="Typo.h6">Your date of birth :</MudText>
+                        <MudDatePicker @bind-Date="_user.BirthDate" For="@(() => _user.BirthDate)" />
+                    </div>
+                    <div class="d-flex justify-center pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                        <MudStack Row="true" Class="align-center" Spacing="5">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OpenUpdatePasswordDialog">Change password</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update profile</MudButton>
+                        </MudStack>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </EditForm>
+    </MudStack>
+    </MudContainer>
+    <AuthorizeView Roles="Customer">
+	    @if(_orders.Count == 0)
+	    {
+            <div class="d-flex justify-center">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+	    }
+        else
+        {
+            <MudStack>
+                <MudPaper Elevation="20" Class="pa-2 mb-2 mt-2 d-flex justify-center">
+                    <MudText Typo="Typo.h2">Your tickets</MudText>
+                </MudPaper>
+                <MudStack Row="true">
+                    @foreach(var order in _orders)
+                    {
+                        <MudPaper Elevation="20" Style="max-width:600px;" Class="pr-4">
+                            <MudStack Row="true">
+                                <MudImage Src="@order.MoviePosterUrl" Height="300"/>
+                                    <MudStack>
+                                        <MudText Class="mt-2" Typo="Typo.h4">@order.MovieTitle</MudText>
+                                        <MudText Typo="Typo.h5">@order.ShowDate.DayOfWeek @order.ShowDate.Day.@order.ShowDate.Month.@order.ShowDate.Year at @order.ShowTime</MudText>
+                                        <MudText Typo="Typo.h6">@order.CinemaName - @order.CinemaAddress</MudText>
+                                        @if (!order.IsPaid)
+                                        {
+                                            <MudButton StartIcon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Primary" @onclick="@(() => PayForOrderAsync(order.IdMovieRepertoire))">Pay</MudButton>
+                                        }
+                                        else
+                                        {
+                                            <MudChip Icon="@Icons.Material.Filled.DoneOutline" Color="Color.Info">Paid</MudChip>
+                                        }
+                                    </MudStack>
+                                </MudStack>
+                        </MudPaper>
+                    }
+                </MudStack>
+                <div class="d-flex justify-center mt-2 mb-2">
+                    <MudPagination Color="Color.Primary" Count="_count" SelectedChanged="OnPageChanged"/>
+                </div>
+            </MudStack>
+	    }
+    </AuthorizeView>
+    </MudStack>
+    <MudDialog @bind-IsVisible="_isUpdatePasswordDialogVisible" Options="_dialogOptions">
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update password
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTextField Label="Enter old password" @bind-Value="@_userPassword.OldPassword" For="@(() => _userPassword.OldPassword)" InputType="InputType.Password"/>
+            <MudTextField Label="Enter new password" @bind-Value="@_userPassword.NewPassword" For="@(() => _userPassword.NewPassword)" InputType="InputType.Password"/>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdatePassword" Class="px-10">Save</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    private int _selected { get; set; } = 0;
+    private bool _isUpdatePasswordDialogVisible = false;
+    private GetUpdateUserProfileDTO _user;
+    private UpdateUserPasswordDTO _userPassword;
+    private List<GetOrderDTO> _orders = new List<GetOrderDTO>();
+    private DialogOptions _dialogOptions = new() { FullWidth = true };
+    private int _count;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUserAsync();
+        await GetOrdersAfterAuthorizationAsync();
+    }
+
+    private async Task GetUserAsync()
+    {
+        _user = await HttpClient.GetFromJsonAsync<GetUpdateUserProfileDTO>("api/users/profile");
+    }
+    private async Task GetOrdersAfterAuthorizationAsync()
+    {
+        var authState = await ((UserAuthenticationStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.IsInRole("Customer"))
+        {
+            _count = await HttpClient.GetFromJsonAsync<int>("api/orders/count");
+            _orders = await HttpClient.GetFromJsonAsync<List<GetOrderDTO>>($"api/orders/{_selected}");
+        }
+    }
+    private async Task OnPageChanged(int i)
+    {
+        _selected = i-1;
+        await GetOrdersAfterAuthorizationAsync();
+    }
+
+    private async Task HandleValidSubmitAsync()
+    {
+        var response = await HttpClient.PutAsJsonAsync("api/users/profile", _user);
+        if (response.IsSuccessStatusCode)
+        {
+            AlertService.DisplayAlert("Successfully changed your profile", Severity.Success);
+        }
+        else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            AlertService.DisplayAlert("Such username already exists, try again", Severity.Error);
+        }
+        else
+        {
+            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+        }
+    }
+    private void OpenUpdatePasswordDialog()
+    {
+        _userPassword = new UpdateUserPasswordDTO();
+        _isUpdatePasswordDialogVisible = true;
+    }
+    private async Task UpdatePassword()
+    {
+        _isUpdatePasswordDialogVisible = false;
+        var response = await HttpClient.PutAsJsonAsync("api/users/profile/password", _userPassword);
+        if (response.IsSuccessStatusCode)
+        {
+            AlertService.DisplayAlert("Successfully changed your password", Severity.Success);
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            AlertService.DisplayAlert("Invalid password, try again", Severity.Error);
+        }
+        else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            AlertService.DisplayAlert("New password cannot be the same as the old password, try again", Severity.Error);
+        }
+        else
+        {
+            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+        }
+    }
+    private async Task PayForOrderAsync(int idMovieRepertoire)
+    {
+        var response = await HttpClient.PutAsync($"api/orders/{idMovieRepertoire}", null);
+		if (response.IsSuccessStatusCode)
+		{
+            _orders = await HttpClient.GetFromJsonAsync<List<GetOrderDTO>>($"api/orders/{_selected}");
+			AlertService.DisplayAlert("Successfully paid for your order", Severity.Success);
+		}
+		else
+		{
+			AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+        }
+    }
+}

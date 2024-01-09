@@ -41,6 +41,7 @@ namespace TIN_Project.Server.Mappers.MoviesRepertoireMappers
             return new GetMovieDetailsDTO
             {
                 IdMovie = movie.IdMovie,
+                IdMovieRepertoire = movieRepertoire.IdMovieRepertoire,
                 Title = movie.Title,
                 Description = movie.Description,
                 TrailerUrl = movie.TrailerUrl,

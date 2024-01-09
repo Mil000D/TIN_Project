@@ -26,8 +26,20 @@ namespace TIN_Project.Server.Services.MoviesServices
         {
             return await _context.Movies.Include(m => m.Genres).Where(m => m.MovieRepertoires.Any(mr => mr.IdRepertoire == idRepertoire)).ToListAsync();
         }
-
-		public async Task DeleteMovieAsync(Movie movie)
+        public async Task<List<Movie>> GetMoviesByMoviesRepertoiresAsync(List<MovieRepertoire> movieRepertoires)
+        {
+            var movies = new List<Movie>();
+            foreach (var movieRepertoire in movieRepertoires)
+            {
+                var movie = await _context.Movies.FirstOrDefaultAsync(x => x.IdMovie == movieRepertoire.IdMovie);
+                if (movie != null)
+                {
+                    movies.Add(movie);
+                }
+            }
+            return movies;
+        }
+        public async Task DeleteMovieAsync(Movie movie)
         {
             _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();

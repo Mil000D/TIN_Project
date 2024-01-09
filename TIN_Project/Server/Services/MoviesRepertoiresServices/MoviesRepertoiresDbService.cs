@@ -17,6 +17,20 @@ namespace TIN_Project.Server.Services.MoviesRepertoiresServices
         {
             return await _context.MovieRepertoires.Where(x => x.IdRepertoire == idRepertoire).ToListAsync();
         }
+        public async Task<List<MovieRepertoire>> GetMoviesRepertoiresByOrdersAsync(List<Order> orders)
+        {
+            var moviesRepertoires = new List<MovieRepertoire>();
+            foreach (var order in orders)
+            {
+                var movieRepertoire = await _context.MovieRepertoires.FirstOrDefaultAsync(x => x.IdMovieRepertoire == order.IdMovieRepertoire);
+                if (movieRepertoire != null)
+                {
+                    moviesRepertoires.Add(movieRepertoire);
+                }
+            }
+            return moviesRepertoires;
+        }
+       
         public async Task<MovieRepertoire?> GetMovieRepertoireByMovieAndRepertoireIdAsync(int idMovie, int idRepertoire)
         {
             return await _context.MovieRepertoires.FirstOrDefaultAsync(x => x.IdMovie == idMovie && x.IdRepertoire == idRepertoire);
@@ -44,12 +58,12 @@ namespace TIN_Project.Server.Services.MoviesRepertoiresServices
             moviesRepertoire.ShowTime = updateMoviesRepertoireDTO.ShowTime;
             await _context.SaveChangesAsync();
         }
-		public async Task<bool> IsMovieShowTimeUnique(AddMoviesRepertoireDTO addMoviesRepertoireDTO)
+		public async Task<bool> IsMovieShowTimeUniqueAsync(AddMoviesRepertoireDTO addMoviesRepertoireDTO)
         {
             var movieRepertoire = await _context.MovieRepertoires.FirstOrDefaultAsync(x => x.IdMovie == addMoviesRepertoireDTO.IdMovie && x.IdRepertoire == addMoviesRepertoireDTO.IdRepertoire && x.ShowTime == addMoviesRepertoireDTO.ShowTime);
             return movieRepertoire == null;
 		}
-		public async Task<bool> IsMovieShowTimeUnique(UpdateMoviesRepertoireDTO updateMoviesRepertoireDTO)
+		public async Task<bool> IsMovieShowTimeUniqueAsync(UpdateMoviesRepertoireDTO updateMoviesRepertoireDTO)
         { 
 			var movieRepertoire = await _context.MovieRepertoires.FirstOrDefaultAsync(x => x.IdMovie == updateMoviesRepertoireDTO.IdMovie && x.IdRepertoire == updateMoviesRepertoireDTO.IdRepertoire && x.ShowTime == updateMoviesRepertoireDTO.ShowTime && x.IdMovieRepertoire != updateMoviesRepertoireDTO.IdMoviesRepertoire);
 			return movieRepertoire == null;

@@ -16,6 +16,9 @@ using TIN_Project.Server.Services.RepertoiresServices;
 using TIN_Project.Server.Mappers.RepertoireMappers;
 using TIN_Project.Server.Mappers.MoviesRepertoireMappers;
 using TIN_Project.Server.Services.MoviesRepertoiresServices;
+using TIN_Project.Server.Mappers.OrderMappers;
+using TIN_Project.Server.Services.OrdersServices;
+using TIN_Project.Shared.Base64Decoder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +37,9 @@ builder.Services.AddScoped<IRepertoiresDbService, RepertoiresDbService>();
 builder.Services.AddScoped<IRepertoireMapper, RepertoireMapper>();
 builder.Services.AddScoped<IMoviesRepertoiresDbService, MoviesRepertoiresDbService>();
 builder.Services.AddScoped<IMoviesRepertoireMapper,  MoviesRepertoireMapper>();
+builder.Services.AddScoped<IOrdersDbService, OrdersDbService>();
+builder.Services.AddScoped<IOrderMapper, OrderMapper>();
+builder.Services.AddSingleton<IDecoder, TIN_Project.Shared.Base64Decoder.Decoder>();
 
 builder.Services.AddDbContext<MainDbContext>(options =>
 {

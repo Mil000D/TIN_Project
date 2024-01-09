@@ -36,7 +36,7 @@ namespace TIN_Project.Server.Controllers.Repertoires
             else
             {
                 var repertoire = _repertoireMapper.MapAddRepertoireDTOToRepertoire(addRepertoireDTO);
-                await _repertoiresDbService.AddRepertoireForCinema(idCinema, repertoire);
+                await _repertoiresDbService.AddRepertoireForCinemaAsync(idCinema, repertoire);
                 return Ok();
             }
         }

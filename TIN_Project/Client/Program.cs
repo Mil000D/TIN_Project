@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using TIN_Project.Client;
 using TIN_Project.Client.Services;
+using TIN_Project.Shared.Base64Decoder;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -11,6 +12,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddMudServices();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
+builder.Services.AddSingleton<IDecoder, Decoder>();
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 builder.Services.AddHttpClient("TIN_Project.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));

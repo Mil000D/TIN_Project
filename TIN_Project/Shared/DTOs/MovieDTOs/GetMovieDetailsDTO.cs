@@ -5,6 +5,7 @@ namespace TIN_Project.Shared.DTOs.MovieDTOs
     public class GetMovieDetailsDTO
     {
         public int IdMovie { get; set; }
+        public int IdMovieRepertoire { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public List<GenreDTO> Genres { get; set; }

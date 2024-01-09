@@ -16,7 +16,7 @@ namespace TIN_Project.Server.Services.RepertoiresServices
         {
             return await _context.Repertoires.OrderBy(x => x.Date).Where(x => x.IdCinema == id).ToListAsync();
         }
-        public async Task AddRepertoireForCinema(int idCinema, Repertoire repertoire)
+        public async Task AddRepertoireForCinemaAsync(int idCinema, Repertoire repertoire)
         {
             var cinema = await _context.Cinemas.FirstOrDefaultAsync(x => x.IdCinema == idCinema);
             repertoire.Cinema = cinema;
@@ -58,6 +58,18 @@ namespace TIN_Project.Server.Services.RepertoiresServices
         {
             return await _context.MovieRepertoires.Where(x => x.IdRepertoire == id).Select(x => x.Movie).ToListAsync();
         }
-
+        public async Task<List<Repertoire>> GetRepertoiresByMoviesRepertoiresAsync(List<MovieRepertoire> movieRepertoires)
+        {
+            var repertoires = new List<Repertoire>();
+            foreach (var movieRepertoire in movieRepertoires)
+            {
+                var repertoire = await _context.Repertoires.FirstOrDefaultAsync(x => x.IdRepertoire == movieRepertoire.IdRepertoire);
+                if(repertoire != null)
+                {
+                    repertoires.Add(repertoire);
+                }
+            }
+            return repertoires;
+        }
     }
 }

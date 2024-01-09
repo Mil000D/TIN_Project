@@ -1,6 +1,7 @@
 ﻿@page "/movie-details/{IdCinema:int}/{IdRepertoire:int}/{IdMovie:int}/{ShowTime}"
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@inject IAlertService AlertService
 
 @if(Movie == null)
 {
@@ -21,7 +22,7 @@ else
             <MudItem xs="12" sm="6" md="8" lg="9">
                 <MudCard Elevation="20">
                     <MudCardContent>
-                        <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                        <div class="pa-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudText Typo="Typo.h6">Genres :</MudText>
                             <MudText Typo="Typo.body2">@string.Join(", ", Movie.Genres.Select(elem => elem.Name))</MudText>
                         </div>
@@ -43,12 +44,14 @@ else
                             <MudText Typo="Typo.h6">Cinema address :</MudText>
                             <MudText Typo="Typo.body2">@Movie.CinemaName - @Movie.CinemaAddress</MudText>
                         </div>
-                        <div class="d-flex justify-center pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                            <MudStack Row="true" Class="align-center" Spacing="5">
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" //@onclick ="() =>">Buy tickets</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" //@onclick ="() => ">Book tickets</MudButton>
-                            </MudStack>
-                        </div>
+                        <AuthorizeView Roles="Customer">
+                            <div class="d-flex justify-center pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                                <MudStack Row="true" Class="align-center" Spacing="5">
+                                    <MudButton StartIcon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Primary" @onclick ="OnBuyClickAsync">Buy ticket</MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.BookOnline" Variant="Variant.Filled" Color="Color.Primary" @onclick="OnBookClickAsync">Book ticket</MudButton>
+                                </MudStack>
+                            </div>
+                        </AuthorizeView>
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -92,4 +95,49 @@ else
         var videoId = query["v"];
         return $"https://www.youtube.com/embed/{videoId}";
     }
+
+    private async Task OnBuyClickAsync()
+    {
+        var orderDTO = new AddOrderDTO
+        {
+            IdMovieRepertoire = Movie.IdMovieRepertoire,
+            IsPaid = true
+        };
+        var response = await HttpClient.PostAsJsonAsync($"api/orders", orderDTO);
+        if(response.IsSuccessStatusCode)
+        {
+            AlertService.DisplayAlert("Successful purchase", Severity.Success);
+        }
+        else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            AlertService.DisplayAlert("You have already reserved/bought ticket for this movie", Severity.Error);
+        }
+        else
+        {
+            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+        }
+
+    }
+
+    private async Task OnBookClickAsync()
+	{
+        var orderDTO = new AddOrderDTO
+            {
+                IdMovieRepertoire = Movie.IdMovieRepertoire,
+                IsPaid = false
+            };
+        var response = await HttpClient.PostAsJsonAsync($"api/orders", orderDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            AlertService.DisplayAlert("Successful reservation", Severity.Success);
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            AlertService.DisplayAlert("You have already reserved/bought the ticket for this movie", Severity.Error);
+        }
+        else
+        {
+            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+        }
+	}
 }

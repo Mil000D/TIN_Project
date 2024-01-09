@@ -10,6 +10,6 @@ namespace TIN_Project.Server.Services.CinemasServices
         public Task DeleteCinemaAsync(Cinema cinema);
         public Task<Cinema?> GetCinemaByIdAsync(int id);
         public Task UpdateCinemaAsync(Cinema cinemaToUpdate, UpdateCinemaDTO cinemaDTO);
-
+        public Task<List<Cinema>> GetCinemasByRepertoiresAsync(List<Repertoire> repertoires);
     }
 }

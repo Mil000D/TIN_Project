@@ -52,5 +52,19 @@ namespace TIN_Project.Server.Mappers.UserMappers
                 Role = role
             };
         }
-    }
+
+        public GetUpdateUserProfileDTO MapUserToGetUpdateUserProfileDTO(User user)
+        {
+            return new GetUpdateUserProfileDTO
+            {
+				IdUser = user.IdUser,
+				Username = user.Username,
+				Name = user.Name,
+				Surname = user.Surname,
+				Email = user.Email,
+				BirthDate = user.BirthDate.ToDateTime(TimeOnly.Parse("0:00")),
+            };
+
+        }
+	}
 }

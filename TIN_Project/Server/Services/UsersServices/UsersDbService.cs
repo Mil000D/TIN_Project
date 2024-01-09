@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using TIN_Project.Server.Context;
 using TIN_Project.Server.Models;
+using TIN_Project.Shared.DTOs.UserDTOs;
 namespace TIN_Project.Server.Services.UsersServices
 {
     public class UsersDbService : IUsersDbService
@@ -29,6 +30,21 @@ namespace TIN_Project.Server.Services.UsersServices
         public Task DeleteUserAsync(User user)
         {
             _context.Users.Remove(user);
+            return _context.SaveChangesAsync();
+        }
+        public async Task UpdateUserAsync(GetUpdateUserProfileDTO userDTO, User user)
+        {
+            user.Username = userDTO.Username;
+            user.Email = userDTO.Email;
+            user.Name = userDTO.Name;
+            user.Surname = userDTO.Surname;
+            user.BirthDate = DateOnly.FromDateTime((DateTime)userDTO.BirthDate);
+            await _context.SaveChangesAsync();
+        }
+
+        public Task UpdateUserPasswordAsync(User user, string newPassword)
+        {
+            user.Password = newPassword;
             return _context.SaveChangesAsync();
         }
     }
