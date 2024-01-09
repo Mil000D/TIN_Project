@@ -15,7 +15,7 @@ namespace TIN_Project.Server.Services.MoviesServices
 
         public async Task<List<Movie>> GetMoviesAsync()
         {
-            return await _context.Movies.Include(m => m.Genres).OrderBy(m => m.Title).ToListAsync();
+            return await _context.Movies.Include(m => m.Genres).OrderBy(m => m.EnglishTitle).ToListAsync();
         }
 
         public async Task<Movie> GetMovieByIdAsync(int id)
@@ -47,8 +47,8 @@ namespace TIN_Project.Server.Services.MoviesServices
 
         public async Task UpdateMovieAsync(Movie movieToUpdate, UpdateMovieDTO movieDTO)
         {
-            movieToUpdate.Title = movieDTO.Title;
-            movieToUpdate.Description = movieDTO.Description;
+            movieToUpdate.EnglishTitle = movieDTO.Title;
+            movieToUpdate.EnglishDescription = movieDTO.Description;
             movieToUpdate.TrailerUrl = movieDTO.TrailerUrl;
             movieToUpdate.PosterUrl = movieDTO.PosterUrl;
             foreach (var genre in _context.Genres)

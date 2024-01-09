@@ -19,7 +19,7 @@ namespace TIN_Project.Server.Mappers.MoviesRepertoireMappers
                 IdMoviesRepertoire = movieRepertoire.IdMovieRepertoire,
                 IdMovie = movieRepertoire.IdMovie,
                 PosterUrl = movies.Where(movie => movie.IdMovie == movieRepertoire.IdMovie).Select(movie => movie.PosterUrl).FirstOrDefault(),
-                Title = movies.Where(movie => movie.IdMovie == movieRepertoire.IdMovie).Select(movie => movie.Title).FirstOrDefault(),
+                Title = movies.Where(movie => movie.IdMovie == movieRepertoire.IdMovie).Select(movie => movie.EnglishTitle).FirstOrDefault(),
                 Date = repertoire.Date.ToDateTime(TimeOnly.Parse("0:00")),
                 ShowTime = movieRepertoire.ShowTime,
                 CinemaName = cinema.Name,
@@ -42,8 +42,8 @@ namespace TIN_Project.Server.Mappers.MoviesRepertoireMappers
             {
                 IdMovie = movie.IdMovie,
                 IdMovieRepertoire = movieRepertoire.IdMovieRepertoire,
-                Title = movie.Title,
-                Description = movie.Description,
+                Title = movie.EnglishTitle,
+                Description = movie.EnglishDescription,
                 TrailerUrl = movie.TrailerUrl,
                 PosterUrl = movie.PosterUrl,
                 Genres = _genreMapper.MapGenresToGenreDTOs(movie.Genres),
@@ -59,7 +59,7 @@ namespace TIN_Project.Server.Mappers.MoviesRepertoireMappers
             return movies.Select(movie => new GetMovieWithShowTimesDTO
             {
                 IdMovie = movie.IdMovie,
-                Title = movie.Title,
+                Title = movie.EnglishTitle,
                 PosterUrl = movie.PosterUrl,
                 Genres = _genreMapper.MapGenresToGenreDTOs(movie.Genres),
                 ShowTimes = movieRepertoires.OrderBy(mr => mr.ShowTime).Where(movieRepertoire => movieRepertoire.IdMovie == movie.IdMovie).Select(movieRepertoire => movieRepertoire.ShowTime).ToList()

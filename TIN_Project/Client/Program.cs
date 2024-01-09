@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
 using MudBlazor.Services;
+using System.Globalization;
 using TIN_Project.Client;
 using TIN_Project.Client.Services;
 using TIN_Project.Shared.Base64Decoder;
@@ -20,4 +22,25 @@ builder.Services.AddHttpClient("TIN_Project.ServerAPI", client => client.BaseAdd
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("TIN_Project.ServerAPI"));
 
-await builder.Build().RunAsync();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+var host = builder.Build();
+
+CultureInfo culture;
+var js = host.Services.GetRequiredService<IJSRuntime>();
+var result = await js.InvokeAsync<string>("getCulture");
+
+if (result != null)
+{
+    culture = new CultureInfo(result);
+}
+else
+{
+    culture = new CultureInfo("en-US");
+    await js.InvokeVoidAsync("setCulture", "en-US");
+}
+
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+await host.RunAsync();

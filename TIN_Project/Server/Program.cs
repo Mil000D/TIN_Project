@@ -22,7 +22,8 @@ using TIN_Project.Shared.Base64Decoder;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+builder.Services.AddLocalization();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ITokenManager, TokenManager>();
 builder.Services.AddScoped<IUsersDbService, UsersDbService>();
@@ -99,7 +100,13 @@ else
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
+var supportedCultures = new[] { "en-US", "pl" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
 
+app.UseRequestLocalization(localizationOptions);
 app.UseRouting();
 
 app.UseAuthentication();

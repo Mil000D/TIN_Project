@@ -2,19 +2,22 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
+@inject IStringLocalizer<MainLayout> Localizer
+@inject IJSRuntime JSRuntime
 <MudThemeProvider @ref="@mudThemeProvider" Theme="myCustomTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
         <MudAppBar Elevation="1">
-            <MudSelect @ref="_select" ValueChanged="@((value) => OnCinemaChanged(value))" Style="max-width:200px; background-color:white;" T="GetCinemaDTO" Label="Cinemas" ToStringFunc="@converter" Value="Cinema" Variant="Variant.Filled" Margin="Margin.Dense">
+            <MudSelect @ref="_select" ValueChanged="@((value) => OnCinemaChanged(value))" Style="max-width:200px; background-color:white;" T="GetCinemaDTO" Label="@Localizer["Cinemas"]" ToStringFunc="@converter" Value="Cinema" Variant="Variant.Filled" Margin="Margin.Dense">
                 @foreach (var cinema in Cinemas)
                 {
                     <MudSelectItem Value="@cinema">@cinema.Name - @cinema.Address</MudSelectItem>
                 }
             </MudSelect>
+            <TIN_Project.Client.Pages.CultureSelector />
+            <MudText>@CultureInfo.CurrentCulture</MudText>
             <MudSpacer/>
             <AuthorizeView>
                 <NotAuthorized>
@@ -67,6 +70,7 @@
 </MudLayout>
 @code
 {
+    private string culture = "English";
     private MudSelect<GetCinemaDTO> _select;
     private bool _ignoreValueChanged = false;
     public bool open = false;

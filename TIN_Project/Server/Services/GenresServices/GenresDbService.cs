@@ -15,7 +15,7 @@ namespace TIN_Project.Server.Services.GenresServices
         }
         public async Task<List<Genre>> GetGenresAsync()
         {
-            return await _context.Genres.OrderBy(g => g.Name).ToListAsync();
+            return await _context.Genres.OrderBy(g => g.EnglishName).ToListAsync();
         }
         public async Task<Genre?> GetGenreByIdAsync(int id)
         {
@@ -28,21 +28,21 @@ namespace TIN_Project.Server.Services.GenresServices
         }
         public async Task UpdateGenreAsync(Genre genreToUpdate, GenreDTO genreDTO)
         {
-            genreToUpdate.Name = genreDTO.Name;
+            genreToUpdate.EnglishName = genreDTO.Name;
             await _context.SaveChangesAsync();
         }
         public async Task AddGenreAsync(GenreDTO genreDTO)
         {
             var genre = new Genre
             {
-                Name = genreDTO.Name
+                EnglishName = genreDTO.Name
             };
             _context.Genres.Add(genre);
             await _context.SaveChangesAsync();
         }
         public async Task<bool> IsNameUniqueAsync(GenreDTO genreDTO)
         {
-            var genreFromDb = await _context.Genres.FirstOrDefaultAsync(g => g.Name == genreDTO.Name && g.IdGenre != genreDTO.IdGenre);
+            var genreFromDb = await _context.Genres.FirstOrDefaultAsync(g => g.EnglishName == genreDTO.Name && g.IdGenre != genreDTO.IdGenre);
             return genreFromDb == null;
         }
     }

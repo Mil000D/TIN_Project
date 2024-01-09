@@ -27,7 +27,7 @@ namespace TIN_Project.Server.Mappers.OrderMappers
                 {
                     IdMovieRepertoire = order.IdMovieRepertoire,
                     MoviePosterUrl = movie.PosterUrl,
-                    MovieTitle = movie.Title,
+                    MovieTitle = movie.EnglishTitle,
                     CinemaName = cinema.Name,
                     CinemaAddress = cinema.Address,
                     ShowDate = repertoire.Date,

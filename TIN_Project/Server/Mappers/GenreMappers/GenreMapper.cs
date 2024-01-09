@@ -10,7 +10,7 @@ namespace TIN_Project.Server.Mappers.GenreMappers
             return genres.Select(genre => new GenreDTO
             {
                 IdGenre = genre.IdGenre,
-                Name = genre.Name
+                Name = genre.EnglishName
             }).ToList();
         }
 
@@ -19,7 +19,7 @@ namespace TIN_Project.Server.Mappers.GenreMappers
             return genreDTOs.Select(genreDTO => new Genre
             {
                 IdGenre = genreDTO.IdGenre,
-                Name = genreDTO.Name
+                EnglishName = genreDTO.Name
             }).ToList();
         }
     }
