@@ -10,12 +10,12 @@
 else if (_movies.Count() == 0)
 {
 	<div class="d-flex justify-center">
-		<MudAlert Severity="Severity.Info">No movies</MudAlert>
+		<MudAlert Elevation="20" Severity="Severity.Info">No movies</MudAlert>
 	</div>
 }
 else
 {
-	<div class ="gap-4 d-flex flex-wrap">
+	<div class="gap-2 d-flex flex-wrap justify-space-around">
 		@foreach (var movie in _movies)
 		{
 			<MudCard Elevation="20" Style="width:290px;">

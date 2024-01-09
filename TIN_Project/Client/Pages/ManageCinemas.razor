@@ -16,7 +16,7 @@
         else if (_cinemas.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Severity="Severity.Info">No cinemas</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">No cinemas</MudAlert>
             </div>
         }
         else
@@ -103,10 +103,10 @@
     }
     private async Task UpdateCinemaAsync()
     {
-        _isUpdateCinemaDialogVisible = false;
         var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/cinemas", _currentCinema);
         if (responseHTTP.IsSuccessStatusCode)
         {
+            _isUpdateCinemaDialogVisible = false;
             await GetCinemasAsync();
             await Parent.RefreshCinemasAsync();
         }

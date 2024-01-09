@@ -16,7 +16,7 @@
         else if (_moviesrepertoires.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Severity="Severity.Info">No movies' repertoires</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">No movies' repertoires</MudAlert>
             </div>
         }
         else
@@ -143,13 +143,13 @@
 
     private async Task AddMoviesRepertoireAsync()
     {
-        _isAddMoviesRepertoireDialogVisible = false;
         _addMoviesRepertoireDTO.IdRepertoire = IdRepertoire;
         _addMoviesRepertoireDTO.IdMovie = _movie.IdMovie;
         _addMoviesRepertoireDTO.ShowTime = TimeOnly.FromTimeSpan((TimeSpan)_time);
         var response = await HttpClient.PostAsJsonAsync("api/moviesrepertoires", _addMoviesRepertoireDTO);
         if (response.IsSuccessStatusCode)
         {
+            _isAddMoviesRepertoireDialogVisible = false;
             await GetMoviesRepertoiresAsync();
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
@@ -176,13 +176,13 @@
 
     private async Task UpdateMoviesRepertoireAsync()
     {
-        _isUpdateMoviesRepertoireDialogVisible = false;
         _updateMoviesRepertoireDTO.IdMovie = _movie.IdMovie;
         _updateMoviesRepertoireDTO.IdRepertoire = IdRepertoire;
         _updateMoviesRepertoireDTO.ShowTime = TimeOnly.FromTimeSpan((TimeSpan)_time);
         var response = await HttpClient.PutAsJsonAsync($"api/moviesrepertoires", _updateMoviesRepertoireDTO);
         if (response.IsSuccessStatusCode)
         {
+            _isUpdateMoviesRepertoireDialogVisible = false;
             await GetMoviesRepertoiresAsync();
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)

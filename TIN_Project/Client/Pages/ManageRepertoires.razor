@@ -16,7 +16,7 @@
         else if (_repertoires.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Severity="Severity.Info">No repertoires</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">No repertoires</MudAlert>
             </div>
         }
         else
@@ -124,11 +124,11 @@
 
     private async Task AddRepertoireAsync()
     {
-        _isAddRepertoireDialogVisible = false;
         _currentAddRepertoire.IdCinema = IdCinema;
         var responseHTTP = await HttpClient.PostAsJsonAsync($"/api/repertoires/{IdCinema}", _currentAddRepertoire);
         if (responseHTTP.IsSuccessStatusCode)
         {
+            _isAddRepertoireDialogVisible = false;
             await GetRepertoiresAsync();
         }
         else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
@@ -143,10 +143,10 @@
 
     private async Task UpdateRepertoireAsync()
     {
-        _isUpdateRepertoireDialogVisible = false;
         var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/repertoires", _currentUpdateRepertoire);
         if (responseHTTP.IsSuccessStatusCode)
         {
+            _isUpdateRepertoireDialogVisible = false;
             await GetRepertoiresAsync();
         }
         else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)

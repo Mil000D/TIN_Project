@@ -97,6 +97,7 @@ else
 	    }
     </AuthorizeView>
     </MudStack>
+
     <MudDialog @bind-IsVisible="_isUpdatePasswordDialogVisible" Options="_dialogOptions">
         <TitleContent>
             <MudText Typo="Typo.h6">
@@ -171,10 +172,10 @@ else
     }
     private async Task UpdatePassword()
     {
-        _isUpdatePasswordDialogVisible = false;
         var response = await HttpClient.PutAsJsonAsync("api/users/profile/password", _userPassword);
         if (response.IsSuccessStatusCode)
         {
+            _isUpdatePasswordDialogVisible = false;
             AlertService.DisplayAlert("Successfully changed your password", Severity.Success);
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)

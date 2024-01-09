@@ -15,7 +15,7 @@
         else if (_genres.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Severity="Severity.Info">No genres</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">No genres</MudAlert>
             </div>
         }
         else
@@ -79,10 +79,10 @@
 
     private async Task UpdateGenreAsync()
     {
-        _isUpdateGenreDialogVisible = false;
         var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/genres", _currentGenre);
         if(responseHTTP.IsSuccessStatusCode)
         {
+            _isUpdateGenreDialogVisible = false;
             await GetGenresAsync();
         }
         else if(responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
@@ -96,10 +96,10 @@
     }
     private async Task AddGenreAsync()
     {
-        _isAddGenreDialogVisible = false;
         var responseHTTP = await HttpClient.PostAsJsonAsync($"/api/genres", _currentGenre);
         if (responseHTTP.IsSuccessStatusCode)
         {
+            _isAddGenreDialogVisible = false;
             await GetGenresAsync();
         }
         else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)

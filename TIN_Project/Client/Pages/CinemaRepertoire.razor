@@ -1,13 +1,13 @@
 ﻿@page "/cinema-repertoire/{IdCinema:int}/{CinemaName}"
 @inject HttpClient HttpClient
 
-@if(_repertoires == null)
+@if (_repertoires == null)
 {
     <MudProgressCircular Indeterminate="true" />
 }
-else if(_repertoires.Count == 0)
+else if (_repertoires.Count == 0)
 {
-    <MudAlert Severity="Severity.Info">No repertoires</MudAlert>
+    <MudAlert Elevation="20" Severity="Severity.Info">No repertoires</MudAlert>
 }
 else
 {
@@ -18,7 +18,8 @@ else
                 <MudSelectItem Value="@repertoire">@repertoire.Date.Day.@repertoire.Date.Month.@repertoire.Date.Year - @repertoire.Date.DayOfWeek</MudSelectItem>
             }
         </MudSelect>
-        <MudPaper Elevation="20" Class="pa-2 mb-4">
+        
+        <MudPaper Elevation="20" Class="pa-2 mb-2">
             <MudText Typo="Typo.h2">@CinemaName</MudText>
         </MudPaper>
         <Movies IdRepertoire="_repertoire.IdRepertoire" IdCinema="IdCinema"></Movies>
