@@ -2,6 +2,7 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.MovieDetails.MovieDetails> Localizer
 
 @if(Movie == null)
 {
@@ -23,32 +24,32 @@ else
                 <MudCard Elevation="20">
                     <MudCardContent>
                         <div class="pa-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                            <MudText Typo="Typo.h6">Genres :</MudText>
-                            <MudText Typo="Typo.body2">@string.Join(", ", Movie.Genres.Select(elem => elem.Name))</MudText>
+                            <MudText Typo="Typo.h6">@Localizer["Genres"]</MudText>
+                            <MudText Typo="Typo.body2">@string.Join(", ", Movie.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudText>
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                            <MudText Typo="Typo.h6">Description :</MudText>
+                            <MudText Typo="Typo.h6">@Localizer["Description"]</MudText>
                             <MudText Typo="Typo.body2">@Movie.Description</MudText>
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudStack Row="true" Class="align-center">
-                                <MudText Typo="Typo.h6">Play trailer</MudText>
+                                <MudText Typo="Typo.h6">@Localizer["Play trailer"]</MudText>
                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.PlayArrow" Size="Size.Medium" @onclick="() => _isTrailerDialogVisible = true" />
                             </MudStack>
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                            <MudText Typo="Typo.h6">Show time :</MudText>
-                            <MudText Typo="Typo.body2">@ShowTime @Movie.Date.Day.@Movie.Date.Month.@Movie.Date.Year</MudText>
+                            <MudText Typo="Typo.h6">@Localizer["Show time"]</MudText>
+                            <MudText Typo="Typo.body2">@ShowTime @Movie.Date.ToLongDateString()</MudText>
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                            <MudText Typo="Typo.h6">Cinema address :</MudText>
+                            <MudText Typo="Typo.h6">@Localizer["Cinema address"]</MudText>
                             <MudText Typo="Typo.body2">@Movie.CinemaName - @Movie.CinemaAddress</MudText>
                         </div>
                         <AuthorizeView Roles="Customer">
                             <div class="d-flex justify-center pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                                 <MudStack Row="true" Class="align-center" Spacing="5">
-                                    <MudButton StartIcon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Primary" @onclick ="OnBuyClickAsync">Buy ticket</MudButton>
-                                    <MudButton StartIcon="@Icons.Material.Filled.BookOnline" Variant="Variant.Filled" Color="Color.Primary" @onclick="OnBookClickAsync">Book ticket</MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Primary" @onclick ="OnBuyClickAsync">@Localizer["Buy ticket"]</MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.BookOnline" Variant="Variant.Filled" Color="Color.Primary" @onclick="OnBookClickAsync">@Localizer["Book ticket"]</MudButton>
                                 </MudStack>
                             </div>
                         </AuthorizeView>
@@ -60,7 +61,7 @@ else
 }
 =
 <MudDialog @bind-IsVisible="_isTrailerDialogVisible" Options="_dialogOptions">
-    <TitleContent>Trailer For @Movie?.Title</TitleContent>
+    <TitleContent>@Localizer["Trailer"] @Movie?.Title</TitleContent>
     <DialogContent>
         <div style="width:900px;height:500px;">
             <iframe src="@GetVideoEmbeddedLink()" allowfullscreen></iframe>
@@ -85,7 +86,7 @@ else
     private GetMovieDetailsDTO? Movie { get; set; }
     private async Task GetMovieDetailsAsync()
     {
-        Movie = await HttpClient.GetFromJsonAsync<GetMovieDetailsDTO>($"api/moviesrepertoires/details?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}&IdMovie={IdMovie}");
+        Movie = await HttpClient.GetFromJsonAsync<GetMovieDetailsDTO>($"api/moviesrepertoires/details?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}&IdMovie={IdMovie}&culture={CultureInfo.CurrentCulture.Name}");
     }
 
     private string GetVideoEmbeddedLink()
@@ -106,15 +107,15 @@ else
         var response = await HttpClient.PostAsJsonAsync($"api/orders", orderDTO);
         if(response.IsSuccessStatusCode)
         {
-            AlertService.DisplayAlert("Successful purchase", Severity.Success);
+            AlertService.DisplayAlert(Localizer["SuccessfulPurchase"], Severity.Success);
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("You have already reserved/bought ticket for this movie", Severity.Error);
+            AlertService.DisplayAlert(Localizer["PurchaseDenied"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ErrorMessage"], Severity.Error);
         }
 
     }
@@ -129,15 +130,15 @@ else
         var response = await HttpClient.PostAsJsonAsync($"api/orders", orderDTO);
         if (response.IsSuccessStatusCode)
         {
-            AlertService.DisplayAlert("Successful reservation", Severity.Success);
+            AlertService.DisplayAlert(Localizer["SuccessfulReservation"], Severity.Success);
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("You have already reserved/bought the ticket for this movie", Severity.Error);
+            AlertService.DisplayAlert(Localizer["PurchaseDenied"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ErrorMessage"], Severity.Error);
         }
 	}
 }

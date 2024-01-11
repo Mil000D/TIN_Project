@@ -4,23 +4,23 @@ namespace TIN_Project.Shared.DTOs.UserDTOs
 {
     public class AddAdminDTO
     {
-        [Required]
-        [MaxLength(20)]
+        [Required(ErrorMessageResourceName = "UsernameRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
+        [MaxLength(20, ErrorMessageResourceName = "UsernameLengthError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public string Username { get; set; }
-        [Required]
-        [MaxLength(20)]
+        [Required(ErrorMessageResourceName = "PasswordRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
+        [MaxLength(20, ErrorMessageResourceName = "PasswordLengthError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public string Password { get; set; }
-        [Required]
-        [EmailAddress]
-        [MaxLength(30)]
+        [Required(ErrorMessageResourceName = "EmailRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
+        [EmailAddress(ErrorMessageResourceName = "EmailAddressError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
+        [MaxLength(30, ErrorMessageResourceName = "EmailLengthError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public string Email { get; set; }
-        [Required]
-        [MaxLength(20)]
+        [Required(ErrorMessageResourceName = "NameRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
+        [MaxLength(20, ErrorMessageResourceName = "NameLengthError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public string Name { get; set; }
-        [Required]
-        [MaxLength(20)]
+        [Required(ErrorMessageResourceName = "SurnameRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
+        [MaxLength(20, ErrorMessageResourceName = "SurnameLengthError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public string Surname { get; set; }
-        [Required]
+        [Required(ErrorMessageResourceName = "BirthDateRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public DateTime? BirthDate { get; set; }
     }
 }

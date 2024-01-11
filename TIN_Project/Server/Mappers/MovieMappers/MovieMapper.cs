@@ -12,12 +12,12 @@ namespace TIN_Project.Server.Mappers.MovieMappers
         {
             _genreMapper = genreMapper;
         }
-        public List<GetMovieDTO> MapMoviesToGetMovieDTOs(List<Movie> movies)
+        public List<GetMovieDTO> MapMoviesToGetMovieDTOs(List<Movie> movies, string culture)
         {
             return movies.Select(movie => new GetMovieDTO
             {
                 IdMovie = movie.IdMovie,
-                Title = movie.EnglishTitle,
+                Title = culture == "en-US" ? movie.EnglishTitle : movie.PolishTitle,
                 PosterUrl = movie.PosterUrl,
                 TrailerUrl = movie.TrailerUrl,
                 Genres = _genreMapper.MapGenresToGenreDTOs(movie.Genres)
@@ -28,8 +28,10 @@ namespace TIN_Project.Server.Mappers.MovieMappers
             return new UpdateMovieDTO
             {
                 IdMovie = movie.IdMovie,
-                Title = movie.EnglishTitle,
-                Description = movie.EnglishDescription,
+                EnglishTitle = movie.EnglishTitle,
+                PolishTitle = movie.PolishTitle,
+                EnglishDescription = movie.EnglishDescription,
+                PolishDescription = movie.PolishDescription,
                 TrailerUrl = movie.TrailerUrl,
                 PosterUrl = movie.PosterUrl,
                 Genres = _genreMapper.MapGenresToGenreDTOs(movie.Genres)
@@ -39,8 +41,10 @@ namespace TIN_Project.Server.Mappers.MovieMappers
         {
             return new Movie
             {
-                EnglishTitle = addMovieDTO.Title,
-                EnglishDescription = addMovieDTO.Description,
+                EnglishTitle = addMovieDTO.EnglishTitle,
+                PolishTitle = addMovieDTO.PolishTitle,
+                EnglishDescription = addMovieDTO.EnglishDescription,
+                PolishDescription = addMovieDTO.PolishDescription,
                 TrailerUrl = addMovieDTO.TrailerUrl,
                 PosterUrl = addMovieDTO.PosterUrl,
                 Genres = new List<Genre>()

@@ -6,7 +6,7 @@ namespace TIN_Project.Shared.DTOs.RepertoireDTOs
     {
         [Required]
         public int IdCinema { get; set; }
-        [Required]
+        [Required(ErrorMessageResourceName = "DateRequiredError", ErrorMessageResourceType = typeof(Resources.RepertoireDTOsResources.Repertoire))]
         public DateTime? Date { get; set; }
     }
 }

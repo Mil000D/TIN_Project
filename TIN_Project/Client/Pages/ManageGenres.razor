@@ -2,10 +2,11 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient HttpClient
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.ManageGenres.ManageGenres> Localizer
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
-        <MudText Align="Align.Center" Typo="Typo.h4">Manage Genres</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h4">@Localizer["Manage Genres"]</MudText>
         @if (_genres == null)
         {
             <div class="d-flex justify-center">
@@ -15,21 +16,21 @@
         else if (_genres.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Elevation="20" Severity="Severity.Info">No genres</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">@Localizer["No genres"]</MudAlert>
             </div>
         }
         else
         {
         <MudTable @ref="@_table" Items="@_genres" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
             <HeaderContent>
-                <MudTh>Name</MudTh>
-                <MudTh>Actions</MudTh>
+                <MudTh>@Localizer["Name"]</MudTh>
+                <MudTh>@Localizer["Actions"]</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Name">@context.Name</MudTd>
-                <MudTd DataLabel="Actions">
-                    <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => OpenUpdateGenreDialog(context.IdGenre))">Update</MudButton>
-                    <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteGenreAsync(context.IdGenre))>Delete</MudButton>
+                <MudTd DataLabel="@Localizer["Name"]">@(CultureInfo.CurrentCulture.Name == "en-US" ? context.EnglishName : context.PolishName)</MudTd>
+                <MudTd DataLabel="@Localizer["Actions"]">
+                    <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => OpenUpdateGenreDialog(context.IdGenre))">@Localizer["Update"]</MudButton>
+                    <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteGenreAsync(context.IdGenre))>@Localizer["Delete"]</MudButton>
                 </MudTd>
             </RowTemplate>
             <PagerContent>
@@ -37,35 +38,37 @@
             </PagerContent>
         </MudTable>
         }
-        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OpenAddGenreDialog">Add genre</MudButton>
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OpenAddGenreDialog">@Localizer["Add genre"]</MudButton>
     </MudStack>
 </MudContainer>
 
 <MudDialog @bind-IsVisible="_isUpdateGenreDialogVisible" Options="_dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update genre
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @Localizer["Update genre"]
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Label="Name of genre" @bind-Value="@_currentGenre.Name" For="@(() => _currentGenre.Name)" />
+        <MudTextField Label="@Localizer["Name of genre EN"]" @bind-Value="@_currentGenre.EnglishName" For="@(() => _currentGenre.EnglishName)" />
+        <MudTextField Label="@Localizer["Name of genre PL"]" @bind-Value="@_currentGenre.PolishName" For="@(() => _currentGenre.PolishName)" />
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateGenreAsync" Class="px-10">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateGenreAsync" Class="px-10">@Localizer["Save"]</MudButton>
     </DialogActions>
 </MudDialog>
 
 <MudDialog @bind-IsVisible="_isAddGenreDialogVisible" Options="_dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Add genre
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @Localizer["Add genre"]
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Label="Name of genre" @bind-Value="@_currentGenre.Name" For="@(() => _currentGenre.Name)" />
+        <MudTextField Label="@Localizer["Name of genre EN"]" @bind-Value="@_currentGenre.EnglishName" For="@(() => _currentGenre.EnglishName)" />
+        <MudTextField Label="@Localizer["Name of genre PL"]" @bind-Value="@_currentGenre.PolishName" For="@(() => _currentGenre.PolishName)" />
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddGenreAsync" Class="px-10">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddGenreAsync" Class="px-10">@Localizer["Save"]</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -87,11 +90,11 @@
         }
         else if(responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("Such genre already exists, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ConflictErrorMessage"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't update genre, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["UpdateErrorMessage"], Severity.Error);
         }
     }
     private async Task AddGenreAsync()
@@ -104,11 +107,11 @@
         }
         else if (responseHTTP.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("Such genre already exists, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ConflictErrorMessage"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't add genre, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["AddErrorMessage"], Severity.Error);
         }
     }
 
@@ -134,13 +137,13 @@
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't delete genre, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["DeleteErrorMessage"], Severity.Error);
         }
     }
     private void OpenUpdateGenreDialog(int id)
     {
         var genre = _genres.FirstOrDefault(x => x.IdGenre == id);
-        _currentGenre = new GenreDTO { IdGenre = genre.IdGenre, Name = genre.Name };
+        _currentGenre = new GenreDTO { IdGenre = genre.IdGenre, EnglishName = genre.EnglishName, PolishName = genre.PolishName };
         _isUpdateGenreDialogVisible = true;
     }
     private void OpenAddGenreDialog()

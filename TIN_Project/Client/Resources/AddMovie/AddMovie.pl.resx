@@ -117,7 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Cinemas" xml:space="preserve">
-    <value>Cinemas</value>
+  <data name="Add" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="Add Movie" xml:space="preserve">
+    <value>Dodaj film</value>
+  </data>
+  <data name="DescriptionEN" xml:space="preserve">
+    <value>Opis po angielsku</value>
+  </data>
+  <data name="DescriptionPL" xml:space="preserve">
+    <value>Opis po polsku</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>Nie udało się dodać filmu, spróbuj ponownie</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>Gatunki</value>
+  </data>
+  <data name="Poster URL" xml:space="preserve">
+    <value>Adres URL plakatu</value>
+  </data>
+  <data name="TitleEN" xml:space="preserve">
+    <value>Tytuł po angielsku</value>
+  </data>
+  <data name="TitlePL" xml:space="preserve">
+    <value>Tytuł po polsku</value>
+  </data>
+  <data name="Trailer URL" xml:space="preserve">
+    <value>Adres URL zwiastunu</value>
   </data>
 </root>

@@ -5,7 +5,7 @@ namespace TIN_Project.Server.Mappers.MovieMappers
 {
     public interface IMovieMapper
     {
-        public List<GetMovieDTO> MapMoviesToGetMovieDTOs(List<Movie> movies);
+        public List<GetMovieDTO> MapMoviesToGetMovieDTOs(List<Movie> movies, string culture);
         public UpdateMovieDTO MapMovieToUpdateMovieDTO(Movie movie);
         public Movie MapAddMovieDTOToMovie(AddMovieDTO addMovieDTO);
 

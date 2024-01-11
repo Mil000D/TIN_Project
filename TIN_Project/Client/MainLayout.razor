@@ -2,58 +2,65 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IStringLocalizer<MainLayout> Localizer
-@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<Resources.MainLayout.MainLayout> Localizer
+@inject ILocalStorageService LocalStorageService
+
 <MudThemeProvider @ref="@mudThemeProvider" Theme="myCustomTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-        <MudAppBar Elevation="1">
-            <MudSelect @ref="_select" ValueChanged="@((value) => OnCinemaChanged(value))" Style="max-width:200px; background-color:white;" T="GetCinemaDTO" Label="@Localizer["Cinemas"]" ToStringFunc="@converter" Value="Cinema" Variant="Variant.Filled" Margin="Margin.Dense">
-                @foreach (var cinema in Cinemas)
+    <MudAppBar Elevation="1">
+        <MudSelect @ref="_select" ValueChanged="@((value) => OnCinemaChanged(value))" Style="max-width:200px; background-color:white;" T="GetCinemaDTO" Label="@Localizer["Cinemas"]" ToStringFunc="@converter" Value="Cinema" Variant="Variant.Filled" Margin="Margin.Dense">
+            @foreach (var cinema in Cinemas)
+            {
+                <MudSelectItem Value="@cinema">@cinema.Name - @cinema.Address</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="string" Value="culture" ValueChanged="@(async (culture) => await OnCultureChangedAsync(culture))" Label="@Localizer["Languages"]" Variant="Variant.Filled" Margin="Margin.Dense" Style="max-width:150px; background-color:white;">
+            <MudSelectItem Value="@($"{Localizer["Polish"]}")">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_Poland.svg" height="14" class="mr-1" /> @Localizer["Polish"]
+            </MudSelectItem>
+            <MudSelectItem Value="@($"{Localizer["English"]}")">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg" height="14" class="mr-1" /> @Localizer["English"]
+            </MudSelectItem>
+        </MudSelect>
+        <MudSpacer />
+        <AuthorizeView>
+            <NotAuthorized>
+                @if (NavigationManager.Uri.Contains("/login"))
                 {
-                    <MudSelectItem Value="@cinema">@cinema.Name - @cinema.Address</MudSelectItem>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" @onclick="@OnRegisterClick">@Localizer["Register"]</MudButton>
                 }
-            </MudSelect>
-            <TIN_Project.Client.Pages.CultureSelector />
-            <MudText>@CultureInfo.CurrentCulture</MudText>
-            <MudSpacer/>
-            <AuthorizeView>
-                <NotAuthorized>
-                    @if (NavigationManager.Uri.Contains("/login"))
-                    {
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" @onclick="@OnRegisterClick">Register</MudButton>
-                    }
-                    else
-                    {
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" @onclick="@OnLoginClick">Login</MudButton>
-                    }
-                </NotAuthorized>
-                <Authorized>
-                    <AuthorizeView Roles="Admin, Customer" Context="innerContext">
-                        <MudButton Class="mr-2" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Person" Color="Color.Info" @onclick="@OnProfileClick">Profile</MudButton>
-                    </AuthorizeView>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Info" @onclick="@OnLogoutClickAsync">Logout</MudButton>
-                </Authorized>
-            </AuthorizeView>
-        </MudAppBar>
+                else
+                {
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" @onclick="@OnLoginClick">@Localizer["Login"]</MudButton>
+                }
+            </NotAuthorized>
+            <Authorized>
+                <AuthorizeView Roles="Admin, Customer" Context="innerContext">
+                    <MudButton Class="mr-2" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Person" Color="Color.Info" @onclick="@OnProfileClick">@Localizer["Profile"]</MudButton>
+                </AuthorizeView>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Info" @onclick="@OnLogoutClickAsync">@Localizer["Logout"]</MudButton>
+            </Authorized>
+        </AuthorizeView>
+    </MudAppBar>
     <AuthorizeView Roles="Admin">
         <Authorized>
             <MudDrawer @bind-Open="@open" ClipMode="DrawerClipMode.Always" OpenMiniOnHover="true" Elevation="1" Variant="DrawerVariant.Mini">
                 <MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Info" Class="pa-2">
                     <MudNavLink Href="@("/manage-movies")" Icon="@Icons.Material.Filled.MovieCreation">
-                            Manage Movies
+                        @Localizer["Manage Movies"]
                     </MudNavLink>
                     <MudNavLink Href="@("/manage-genres")" Icon="@Icons.Material.Filled.AddToPhotos">
-                        Manage Genres
-                        </MudNavLink>
+                        @Localizer["Manage Genres"]
+                    </MudNavLink>
                     <MudNavLink Href="@("/manage-cinemas")" Icon="@Icons.Material.Filled.CameraIndoor">
-                        Manage Cinemas
+                        @Localizer["Manage Cinemas"]
                     </MudNavLink>
                     <AuthorizeView Roles="Superuser" Context="innerContext">
                         <MudNavLink Href="@("/manage-users")" Icon="@Icons.Material.Filled.Person">
-                            Manage Users
+                            @Localizer["Manage Users"]
                         </MudNavLink>
                     </AuthorizeView>
                 </MudNavMenu>
@@ -70,25 +77,25 @@
 </MudLayout>
 @code
 {
-    private string culture = "English";
+    private string culture;
     private MudSelect<GetCinemaDTO> _select;
     private bool _ignoreValueChanged = false;
     public bool open = false;
     MudTheme myCustomTheme = new MudTheme()
+        {
+            Palette = new PaletteLight()
             {
-                Palette = new PaletteLight()
-                {
-                    Primary = "#2196F3",
-                    TextPrimary = "#2196F3",
-                    AppbarBackground = "#2196F3",
-                    Background = "#2196F3",
-                    TextSecondary = "#2196F3",
-                },
-                LayoutProperties = new LayoutProperties()
-                {
-                    DrawerMiniWidthLeft = "72px",
-                }
-            };
+                Primary = "#2196F3",
+                TextPrimary = "#2196F3",
+                AppbarBackground = "#2196F3",
+                Background = "#2196F3",
+                TextSecondary = "#2196F3",
+            },
+            LayoutProperties = new LayoutProperties()
+            {
+                DrawerMiniWidthLeft = "72px",
+            }
+        };
 
     private MudThemeProvider mudThemeProvider = null!;
 
@@ -96,8 +103,10 @@
     private List<GetCinemaDTO> Cinemas { get; set; } = new List<GetCinemaDTO>();
     protected override async Task OnInitializedAsync()
     {
+        culture = await LocalStorageService.GetItemAsStringAsync("culture") == "pl" ? Localizer["Polish"] : Localizer["English"];
         await GetCinemasAsync();
     }
+
     private async Task GetCinemasAsync()
     {
         Cinemas = await HttpClient.GetFromJsonAsync<List<GetCinemaDTO>>("api/cinemas");
@@ -136,6 +145,31 @@
         }
         Cinema = cinema;
         NavigationManager.NavigateTo($"/cinema-repertoire/{cinema.IdCinema}/{cinema.Name}");
+    }
+    private CultureInfo[] supportedCultures = new[]
+    {
+        new CultureInfo("en-US"),
+        new CultureInfo("pl")
+    };
+
+    private async Task OnCultureChangedAsync(string culture)
+    {
+        this.culture = culture;
+        if (culture == Localizer["English"])
+        {
+            culture = "en-US";
+        }
+        else
+        {
+            culture = "pl";
+        }
+
+        var selectedCulture = supportedCultures.FirstOrDefault(c => c.Name == culture);
+        if (selectedCulture.Name != CultureInfo.CurrentCulture.Name)
+        {
+            await LocalStorageService.SetItemAsStringAsync("culture", selectedCulture.Name);
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        }
     }
 
     private Func<GetCinemaDTO, string> converter = c => c?.Name;

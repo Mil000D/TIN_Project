@@ -4,9 +4,9 @@ namespace TIN_Project.Shared.DTOs.UserDTOs
 {
     public class LoginUserDTO
     {
-        [Required]
+        [Required(ErrorMessageResourceName = "UsernameRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public string Username { get; set; }
-        [Required]
+        [Required(ErrorMessageResourceName = "PasswordRequiredError", ErrorMessageResourceType = typeof(Resources.UserDTOsResources.User))]
         public string Password { get; set; }
     }
 }

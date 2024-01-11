@@ -36,14 +36,14 @@ namespace TIN_Project.Server.Mappers.MoviesRepertoireMappers
                 ShowTime = addMoviesRepertoireDTO.ShowTime
             };
         }
-        public GetMovieDetailsDTO MapMovieToGetMovieDetailsDTO(Movie movie, Cinema cinema, Repertoire repertoire, MovieRepertoire movieRepertoire)
+        public GetMovieDetailsDTO MapMovieToGetMovieDetailsDTO(Movie movie, Cinema cinema, Repertoire repertoire, MovieRepertoire movieRepertoire, string culture)
         {
             return new GetMovieDetailsDTO
             {
                 IdMovie = movie.IdMovie,
                 IdMovieRepertoire = movieRepertoire.IdMovieRepertoire,
-                Title = movie.EnglishTitle,
-                Description = movie.EnglishDescription,
+                Title = culture == "en-US" ? movie.EnglishTitle : movie.PolishTitle,
+                Description = culture == "en-US" ? movie.EnglishDescription : movie.PolishDescription,
                 TrailerUrl = movie.TrailerUrl,
                 PosterUrl = movie.PosterUrl,
                 Genres = _genreMapper.MapGenresToGenreDTOs(movie.Genres),
@@ -54,12 +54,12 @@ namespace TIN_Project.Server.Mappers.MoviesRepertoireMappers
             };
         }
 
-        public List<GetMovieWithShowTimesDTO> MapMovieToGetMovieWithShowTimesDTOs(List<Movie> movies, List<MovieRepertoire> movieRepertoires)
+        public List<GetMovieWithShowTimesDTO> MapMovieToGetMovieWithShowTimesDTOs(List<Movie> movies, List<MovieRepertoire> movieRepertoires, string culture)
         {
             return movies.Select(movie => new GetMovieWithShowTimesDTO
             {
                 IdMovie = movie.IdMovie,
-                Title = movie.EnglishTitle,
+                Title = culture == "en-US" ? movie.EnglishTitle : movie.PolishTitle,
                 PosterUrl = movie.PosterUrl,
                 Genres = _genreMapper.MapGenresToGenreDTOs(movie.Genres),
                 ShowTimes = movieRepertoires.OrderBy(mr => mr.ShowTime).Where(movieRepertoire => movieRepertoire.IdMovie == movie.IdMovie).Select(movieRepertoire => movieRepertoire.ShowTime).ToList()

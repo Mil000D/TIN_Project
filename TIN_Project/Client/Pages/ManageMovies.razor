@@ -3,10 +3,11 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.ManageMovies.ManageMovies> Localizer
 
 <MudContainer Class="d-flex justify-center" >
     <MudStack>
-        <MudText Align="Align.Center" Typo="Typo.h4">Manage Movies</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h4">@Localizer["Manage Movies"]</MudText>
         @if (_movies == null)
         {
             <div class="d-flex justify-center">
@@ -16,25 +17,25 @@
         else if (_movies.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Elevation="20" Severity="Severity.Info">No movies</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">@Localizer["No movies"]</MudAlert>
             </div>
         }
         else
         {
             <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_movies" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
-                    <MudTh>Poster</MudTh>
-                    <MudTh>Title</MudTh>
-                    <MudTh>Genres</MudTh>
-                    <MudTh>Actions</MudTh>
+                    <MudTh>@Localizer["Poster"]</MudTh>
+                    <MudTh>@Localizer["Title"]</MudTh>
+                    <MudTh>@Localizer["Genres"]</MudTh>
+                    <MudTh>@Localizer["Actions"]</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Poster"><MudImage Src="@context.PosterUrl" Width="70" Height="100"></MudImage></MudTd>
-                    <MudTd DataLabel="Title">@context.Title</MudTd>
-                    <MudTd DataLabel="Genres">@string.Join(", ", context.Genres.Select(elem => elem.Name))</MudTd>
-                    <MudTd DataLabel="Actions">
-                        <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => UpdateMovie(context.IdMovie))">Update</MudButton>
-                        <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteMovieAsync(context.IdMovie))>Delete</MudButton>
+                    <MudTd DataLabel="@Localizer["Poster"]"><MudImage Src="@context.PosterUrl" Width="70" Height="100"></MudImage></MudTd>
+                    <MudTd DataLabel="@Localizer["Title"]">@context.Title</MudTd>
+                    <MudTd DataLabel="@Localizer["Genres"]">@string.Join(", ", context.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudTd>
+                    <MudTd DataLabel="@Localizer["Actions"]">
+                        <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => UpdateMovie(context.IdMovie))">@Localizer["Update"]</MudButton>
+                        <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteMovieAsync(context.IdMovie))>@Localizer["Delete"]</MudButton>
                     </MudTd>
                 </RowTemplate>
                 <PagerContent>
@@ -44,11 +45,11 @@
                 </PagerContent>
             </MudTable>
         }
-        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OnAddMovieClick">Add movie</MudButton>
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OnAddMovieClick">@Localizer["Add movie"]</MudButton>
     </MudStack>
 </MudContainer>
 
-@code {
+    @code {
     private MudTable<GetMovieDTO> _table;
     private IEnumerable<GetMovieDTO>? _movies;
     private void OnAddMovieClick()
@@ -65,7 +66,8 @@
     }
     private async Task GetMoviesAsync()
     {
-        _movies = await HttpClient.GetFromJsonAsync<List<GetMovieDTO>>("api/movies");
+        var culture = CultureInfo.CurrentCulture.Name;
+        _movies = await HttpClient.GetFromJsonAsync<List<GetMovieDTO>>($"api/movies?culture={culture}");
     }
     private async Task DeleteMovieAsync(int id)
     {
@@ -76,7 +78,7 @@
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't delete movie, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["DeleteErrorMessage"], Severity.Error);
         }
     }
     private void AddMovie()

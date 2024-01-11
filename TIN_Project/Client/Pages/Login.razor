@@ -2,25 +2,27 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IStringLocalizer<Resources.Login.Login> Localizer
 
 <EditForm Model="@UserDTO" OnValidSubmit="@HandleValidSubmitAsync">
 <DataAnnotationsValidator/>
+<MudText Align="Align.Center" Typo="Typo.h4" Class="mb-2">@Localizer["LoginTitle"]</MudText>
 <MudCard Elevation="20" Style="min-width: 400px;">
     <MudCardContent>
-            <MudTextField Label="First name" @bind-Value="UserDTO.Username" For="@(() => UserDTO.Username)" />
-            <MudTextField Label="Password" @bind-Value="UserDTO.Password" For="@(() => UserDTO.Password)" InputType="InputType.Password" />
+            <MudTextField Label="@Localizer["Username"]" @bind-Value="UserDTO.Username" For="@(() => UserDTO.Username)" />
+            <MudTextField Label="@Localizer["Password"]" @bind-Value="UserDTO.Password" For="@(() => UserDTO.Password)" InputType="InputType.Password" />
             <MudText Color="Color.Error">@_errorMessage</MudText>
     </MudCardContent>
     <MudCardActions Class="justify-center">
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@Localizer["Log in"]</MudButton>
     </MudCardActions>
 </MudCard>
 <MudCard Elevation="20" Style="min-width: 400px;" Class="mt-3">
     <MudCardContent Class="d-flex justify-center">
-            <MudText Typo="Typo.h6">Don't have an account?</MudText>
+            <MudText Typo="Typo.h6">@Localizer["Don't have an account?"]</MudText>
     </MudCardContent>
     <MudCardActions Class="justify-center">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="@OnRegisterClick">Register</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="@OnRegisterClick">@Localizer["Register"]</MudButton>
     </MudCardActions>
 </MudCard>
 </EditForm>
@@ -46,7 +48,7 @@
         }
         else
         {
-            _errorMessage = "Invalid username or password";
+            _errorMessage = Localizer["ErrorMessage"];
         }
     }
     private void OnRegisterClick()

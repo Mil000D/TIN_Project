@@ -23,8 +23,7 @@ using TIN_Project.Shared.Base64Decoder;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddLocalization();
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddDataAnnotationsLocalization();
 builder.Services.AddScoped<ITokenManager, TokenManager>();
 builder.Services.AddScoped<IUsersDbService, UsersDbService>();
 builder.Services.AddScoped<IUserMapper, UserMapper>();
@@ -41,7 +40,6 @@ builder.Services.AddScoped<IMoviesRepertoireMapper,  MoviesRepertoireMapper>();
 builder.Services.AddScoped<IOrdersDbService, OrdersDbService>();
 builder.Services.AddScoped<IOrderMapper, OrderMapper>();
 builder.Services.AddSingleton<IDecoder, TIN_Project.Shared.Base64Decoder.Decoder>();
-
 builder.Services.AddDbContext<MainDbContext>(options =>
 {
 	options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -100,13 +98,7 @@ else
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-var supportedCultures = new[] { "en-US", "pl" };
-var localizationOptions = new RequestLocalizationOptions()
-    .SetDefaultCulture(supportedCultures[0])
-    .AddSupportedCultures(supportedCultures)
-    .AddSupportedUICultures(supportedCultures);
 
-app.UseRequestLocalization(localizationOptions);
 app.UseRouting();
 
 app.UseAuthentication();

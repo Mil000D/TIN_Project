@@ -1,5 +1,6 @@
 ﻿@page "/cinema-repertoire/{IdCinema:int}/{CinemaName}"
 @inject HttpClient HttpClient
+@inject IStringLocalizer<Resources.CinemaRepertoire.CinemaRepertoire> Localizer
 
 @if (_repertoires == null)
 {
@@ -7,15 +8,15 @@
 }
 else if (_repertoires.Count == 0)
 {
-    <MudAlert Elevation="20" Severity="Severity.Info">No repertoires</MudAlert>
+    <MudAlert Elevation="20" Severity="Severity.Info">@Localizer["No repertoires"]</MudAlert>
 }
 else
 {
     <div class="d-flex flex-column">
-        <MudSelect Style="max-width:200px;" T="GetRepertoireDTO" Label="Repertoire" ToStringFunc="@converter" @bind-Value="_repertoire" Variant="Variant.Filled">
+        <MudSelect Style="max-width:200px;" T="GetRepertoireDTO" Label="@Localizer["Repertoire"]" ToStringFunc="@converter" @bind-Value="_repertoire" Variant="Variant.Filled">
             @foreach (var repertoire in _repertoires)
             {
-                <MudSelectItem Value="@repertoire">@repertoire.Date.Day.@repertoire.Date.Month.@repertoire.Date.Year - @repertoire.Date.DayOfWeek</MudSelectItem>
+                <MudSelectItem Value="@repertoire">@repertoire.Date.ToLongDateString()</MudSelectItem>
             }
         </MudSelect>
         
@@ -46,5 +47,5 @@ else
         _repertoires = await HttpClient.GetFromJsonAsync<List<GetRepertoireDTO>>($"api/repertoires/{IdCinema}");
         _repertoire = _repertoires.FirstOrDefault();
     }
-    private Func<GetRepertoireDTO, string> converter = g => $"{g.Date.Day}.{g.Date.Month}.{g.Date.Year} - {g.Date.DayOfWeek}";
+    private Func<GetRepertoireDTO, string> converter = g => g.Date.ToLongDateString();
 }

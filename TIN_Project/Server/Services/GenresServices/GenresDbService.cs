@@ -28,21 +28,23 @@ namespace TIN_Project.Server.Services.GenresServices
         }
         public async Task UpdateGenreAsync(Genre genreToUpdate, GenreDTO genreDTO)
         {
-            genreToUpdate.EnglishName = genreDTO.Name;
+            genreToUpdate.EnglishName = genreDTO.EnglishName;
+            genreToUpdate.PolishName = genreDTO.PolishName;
             await _context.SaveChangesAsync();
         }
         public async Task AddGenreAsync(GenreDTO genreDTO)
         {
             var genre = new Genre
             {
-                EnglishName = genreDTO.Name
+                EnglishName = genreDTO.EnglishName,
+                PolishName = genreDTO.PolishName
             };
             _context.Genres.Add(genre);
             await _context.SaveChangesAsync();
         }
         public async Task<bool> IsNameUniqueAsync(GenreDTO genreDTO)
         {
-            var genreFromDb = await _context.Genres.FirstOrDefaultAsync(g => g.EnglishName == genreDTO.Name && g.IdGenre != genreDTO.IdGenre);
+            var genreFromDb = await _context.Genres.FirstOrDefaultAsync(g => (g.EnglishName == genreDTO.EnglishName || g.PolishName == genreDTO.PolishName) && g.IdGenre != genreDTO.IdGenre);
             return genreFromDb == null;
         }
     }

@@ -4,6 +4,7 @@
 @inject IAlertService AlertService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAuthorizationService AuthorizationService
+@inject IStringLocalizer<Resources.Profile.Profile> Localizer
 
 @if (_user == null)
 {
@@ -19,34 +20,34 @@ else
         <EditForm Model="@_user" OnValidSubmit="HandleValidSubmitAsync">
         <DataAnnotationsValidator />
 	        <MudPaper Elevation="20" Class="pa-2 mb-2 mt-2">
-		        <MudText Typo="Typo.h2">Welcome @_user.Username</MudText>
+		        <MudText Typo="Typo.h2">@Localizer["Welcome"] @_user.Username</MudText>
 	        </MudPaper>
             <MudCard Elevation="20" Class="mb-4">
                 <MudCardContent>
                     <div class="pa-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                        <MudText Typo="Typo.h6">Your username :</MudText>
+                        <MudText Typo="Typo.h6">@Localizer["Your username"]</MudText>
                         <MudTextField @bind-Value="_user.Username" For="@(() => _user.Username)" />
                     </div>
                     <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                        <MudText Typo="Typo.h6">Your e-mail :</MudText>
+                        <MudText Typo="Typo.h6">@Localizer["Your e-mail"]</MudText>
                         <MudTextField @bind-Value="_user.Email" For="@(() => _user.Email)" />
                     </div>
                     <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                        <MudText Typo="Typo.h6">Your name :</MudText>
+                        <MudText Typo="Typo.h6">@Localizer["Your name"]</MudText>
                         <MudTextField @bind-Value="_user.Name" For="@(() => _user.Name)" />
                     </div>
                     <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                        <MudText Typo="Typo.h6">Your surname :</MudText>
+                        <MudText Typo="Typo.h6">@Localizer["Your surname"]</MudText>
                         <MudTextField @bind-Value="_user.Surname" For="@(() => _user.Surname)" />
                     </div>
                     <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                        <MudText Typo="Typo.h6">Your date of birth :</MudText>
+                        <MudText Typo="Typo.h6">@Localizer["Your date of birth"]</MudText>
                         <MudDatePicker @bind-Date="_user.BirthDate" For="@(() => _user.BirthDate)" />
                     </div>
                     <div class="d-flex justify-center pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                         <MudStack Row="true" Class="align-center" Spacing="5">
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OpenUpdatePasswordDialog">Change password</MudButton>
-                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update profile</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OpenUpdatePasswordDialog">@Localizer["Change password"]</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@Localizer["Update profile"]</MudButton>
                         </MudStack>
                     </div>
                 </MudCardContent>
@@ -65,7 +66,7 @@ else
         {
             <MudStack>
                 <MudPaper Elevation="20" Class="pa-2 mb-2 mt-2 d-flex justify-center">
-                    <MudText Typo="Typo.h2">Your tickets</MudText>
+                    <MudText Typo="Typo.h2">@Localizer["Your tickets"]</MudText>
                 </MudPaper>
                 <MudStack Row="true">
                     @foreach(var order in _orders)
@@ -79,11 +80,11 @@ else
                                         <MudText Typo="Typo.h6">@order.CinemaName - @order.CinemaAddress</MudText>
                                         @if (!order.IsPaid)
                                         {
-                                            <MudButton StartIcon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Primary" @onclick="@(() => PayForOrderAsync(order.IdMovieRepertoire))">Pay</MudButton>
+                                            <MudButton StartIcon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Primary" @onclick="@(() => PayForOrderAsync(order.IdMovieRepertoire))">@Localizer["Pay"]</MudButton>
                                         }
                                         else
                                         {
-                                            <MudChip Icon="@Icons.Material.Filled.DoneOutline" Color="Color.Info">Paid</MudChip>
+                                            <MudChip Icon="@Icons.Material.Filled.DoneOutline" Color="Color.Info">@Localizer["Paid"]</MudChip>
                                         }
                                     </MudStack>
                                 </MudStack>
@@ -101,15 +102,15 @@ else
     <MudDialog @bind-IsVisible="_isUpdatePasswordDialogVisible" Options="_dialogOptions">
         <TitleContent>
             <MudText Typo="Typo.h6">
-                <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update password
+                <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @Localizer["Update password"]
             </MudText>
         </TitleContent>
         <DialogContent>
-            <MudTextField Label="Enter old password" @bind-Value="@_userPassword.OldPassword" For="@(() => _userPassword.OldPassword)" InputType="InputType.Password"/>
-            <MudTextField Label="Enter new password" @bind-Value="@_userPassword.NewPassword" For="@(() => _userPassword.NewPassword)" InputType="InputType.Password"/>
+            <MudTextField Label="@Localizer["Enter old password"]" @bind-Value="@_userPassword.OldPassword" For="@(() => _userPassword.OldPassword)" InputType="InputType.Password"/>
+            <MudTextField Label="@Localizer["Enter new password"]" @bind-Value="@_userPassword.NewPassword" For="@(() => _userPassword.NewPassword)" InputType="InputType.Password"/>
         </DialogContent>
         <DialogActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdatePassword" Class="px-10">Save</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdatePassword" Class="px-10">@Localizer["Save"]</MudButton>
         </DialogActions>
     </MudDialog>
 }
@@ -154,15 +155,15 @@ else
         var response = await HttpClient.PutAsJsonAsync("api/users/profile", _user);
         if (response.IsSuccessStatusCode)
         {
-            AlertService.DisplayAlert("Successfully changed your profile", Severity.Success);
+            AlertService.DisplayAlert(Localizer["UpdateMessage"], Severity.Success);
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("Such username already exists, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ConflictErrorMessage"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ErrorMessage"], Severity.Error);
         }
     }
     private void OpenUpdatePasswordDialog()
@@ -176,19 +177,19 @@ else
         if (response.IsSuccessStatusCode)
         {
             _isUpdatePasswordDialogVisible = false;
-            AlertService.DisplayAlert("Successfully changed your password", Severity.Success);
+            AlertService.DisplayAlert(Localizer["ChangePasswordMessage"], Severity.Success);
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
-            AlertService.DisplayAlert("Invalid password, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["InvalidPassword"], Severity.Error);
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("New password cannot be the same as the old password, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["CompareErrorPassword"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ErrorMessage"], Severity.Error);
         }
     }
     private async Task PayForOrderAsync(int idMovieRepertoire)
@@ -197,11 +198,11 @@ else
 		if (response.IsSuccessStatusCode)
 		{
             _orders = await HttpClient.GetFromJsonAsync<List<GetOrderDTO>>($"api/orders/{_selected}");
-			AlertService.DisplayAlert("Successfully paid for your order", Severity.Success);
+            AlertService.DisplayAlert(Localizer["PaymentSuccessful"], Severity.Success);
 		}
 		else
 		{
-			AlertService.DisplayAlert("Something went wrong, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ErrorMessage"], Severity.Error);
         }
     }
 }

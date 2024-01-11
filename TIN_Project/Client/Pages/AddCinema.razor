@@ -3,16 +3,18 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.AddCinema.AddCinema> Localizer
 
 <EditForm Model="@_addCinemaDTO" OnValidSubmit="@HandleValidSubmitAsync">
     <DataAnnotationsValidator />
+    <MudText Align="Align.Center" Typo="Typo.h4" Class="mb-2">@Localizer["Add Cinema"]</MudText>
     <MudCard Elevation="20" Style="min-width: 400px;">
         <MudCardContent>
-            <MudTextField Label="Name" @bind-Value="_addCinemaDTO.Name" For="@(() => _addCinemaDTO.Name)" />
-            <MudTextField Label="Address" @bind-Value="_addCinemaDTO.Address" For="@(() => _addCinemaDTO.Address)" />
+            <MudTextField Label="@Localizer["Name"]" @bind-Value="_addCinemaDTO.Name" For="@(() => _addCinemaDTO.Name)" />
+            <MudTextField Label="@Localizer["Address"]" @bind-Value="_addCinemaDTO.Address" For="@(() => _addCinemaDTO.Address)" />
         </MudCardContent>
         <MudCardActions Class="justify-center">
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@Localizer["Add"]</MudButton>
         </MudCardActions>
     </MudCard>
 </EditForm>
@@ -33,7 +35,7 @@
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't add cinema, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ErrorMessage"], Severity.Error);
         }
     }
 }

@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -11,6 +12,7 @@ using TIN_Project.Shared.Base64Decoder;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+builder.Services.AddLocalization();
 builder.Services.AddMudServices();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
@@ -22,13 +24,12 @@ builder.Services.AddHttpClient("TIN_Project.ServerAPI", client => client.BaseAdd
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("TIN_Project.ServerAPI"));
 
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-
+builder.Services.AddBlazoredLocalStorage();
 var host = builder.Build();
 
 CultureInfo culture;
-var js = host.Services.GetRequiredService<IJSRuntime>();
-var result = await js.InvokeAsync<string>("getCulture");
+var localStorage = host.Services.GetRequiredService<ILocalStorageService>();
+var result = await localStorage.GetItemAsStringAsync("culture");
 
 if (result != null)
 {
@@ -37,7 +38,7 @@ if (result != null)
 else
 {
     culture = new CultureInfo("en-US");
-    await js.InvokeVoidAsync("setCulture", "en-US");
+    await localStorage.SetItemAsStringAsync("culture", "en-US");
 }
 
 CultureInfo.DefaultThreadCurrentCulture = culture;

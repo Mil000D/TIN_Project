@@ -9,4 +9,58 @@
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\GenreDTOsResources\Genre.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Genre.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MovieDTOsResources\Movie.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Movie.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MoviesRepertoireDTOsResources\MoviesRepertoire.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MoviesRepertoire.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\RepertoireDTOsResources\Repertoire.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Repertoire.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\UserDTOsResources\User.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>User.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\GenreDTOsResources\Genre.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Genre.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\MovieDTOsResources\Movie.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Movie.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\MoviesRepertoireDTOsResources\MoviesRepertoire.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MoviesRepertoire.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\RepertoireDTOsResources\Repertoire.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Repertoire.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\UserDTOsResources\User.pl.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\UserDTOsResources\User.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>User.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

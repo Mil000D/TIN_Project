@@ -1,5 +1,6 @@
 ﻿@inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<Resources.Movies.Movies> Localizer
 
 @if (_movies == null)
 {
@@ -10,7 +11,7 @@
 else if (_movies.Count() == 0)
 {
 	<div class="d-flex justify-center">
-		<MudAlert Elevation="20" Severity="Severity.Info">No movies</MudAlert>
+		<MudAlert Elevation="20" Severity="Severity.Info">@Localizer["No movies"]</MudAlert>
 	</div>
 }
 else
@@ -22,7 +23,7 @@ else
 				<MudCardMedia Image="@movie.PosterUrl" Height="400" />
 				<MudCardContent Style="min-height:150px;">
 					<MudText Typo="Typo.h6">@movie.Title</MudText>
-					<MudText Typo="Typo.body2">Genres : @string.Join(", ", movie.Genres.Select(elem => elem.Name))</MudText>
+					<MudText Typo="Typo.body2">@Localizer["Genres"] : @string.Join(", ", movie.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudText>
 				</MudCardContent>
 				<MudCardActions Style="min-height:100px;">
 					<MudContainer Class="gap-4 d-flex flex-wrap">
@@ -53,7 +54,7 @@ else
     }
 	private async Task GetMoviesAsync()
     {
-        _movies = await HttpClient.GetFromJsonAsync<List<GetMovieWithShowTimesDTO>>($"api/moviesrepertoires/showtimes/{IdRepertoire}");
+        _movies = await HttpClient.GetFromJsonAsync<List<GetMovieWithShowTimesDTO>>($"api/moviesrepertoires/showtimes/{IdRepertoire}?culture={CultureInfo.CurrentCulture.Name}");
     }
 	private void NavigateToMovieDetails(int idMovie, TimeOnly showTime)
     {

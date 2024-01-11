@@ -3,10 +3,11 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.ManageCinemas.ManageCinemas> Localizer
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
-        <MudText Align="Align.Center" Typo="Typo.h4">Manage Cinemas</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h4">@Localizer["Manage Cinemas"]</MudText>
         @if (_cinemas == null)
         {
             <div class="d-flex justify-center">
@@ -16,24 +17,24 @@
         else if (_cinemas.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Elevation="20" Severity="Severity.Info">No cinemas</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">@Localizer["No cinemas"]</MudAlert>
             </div>
         }
         else
         {
             <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_cinemas" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
-                    <MudTh>Name</MudTh>
-                    <MudTh>Address</MudTh>
-                    <MudTh>Actions</MudTh>
+                    <MudTh>@Localizer["Name"]</MudTh>
+                    <MudTh>@Localizer["Address"]</MudTh>
+                    <MudTh>@Localizer["Actions"]</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                        <MudTd DataLabel="Name">@context.Name</MudTd>
-                        <MudTd DataLabel="Address">@context.Address</MudTd>
-                        <MudTd DataLabel="Actions">
-                            <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => OpenUpdateCinemaDialog(context.IdCinema))">Update</MudButton>
-                            <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteCinemaAsync(context.IdCinema))>Delete</MudButton>
-                            <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => ManageRepertoires(context.IdCinema, context.Name))">Manage repertoire</MudButton>
+                        <MudTd DataLabel="@Localizer["Name"]">@context.Name</MudTd>
+                        <MudTd DataLabel="@Localizer["Address"]">@context.Address</MudTd>
+                        <MudTd DataLabel="@Localizer["Actions"]">
+                            <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => OpenUpdateCinemaDialog(context.IdCinema))">@Localizer["Update"]</MudButton>
+                            <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteCinemaAsync(context.IdCinema))>@Localizer["Delete"]</MudButton>
+                            <MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => ManageRepertoires(context.IdCinema, context.Name))">@Localizer["Manage repertoire"]</MudButton>
                         </MudTd>
                 </RowTemplate>
                 <PagerContent>
@@ -43,22 +44,22 @@
                 </PagerContent>
             </MudTable>
         }
-        <MudButton Style="background-color: #2196F3; color: white;" @onclick="AddCinema">Add cinema</MudButton>
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="AddCinema">@Localizer["Add cinema"]</MudButton>
     </MudStack>
 </MudContainer>
 
 <MudDialog @bind-IsVisible="_isUpdateCinemaDialogVisible" Options="_dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update cinema
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @Localizer["Update cinema"]
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Label="Name" @bind-Value="@_currentCinema.Name" For="@(() => _currentCinema.Name)" />
-        <MudTextField Label="Address" @bind-Value="@_currentCinema.Address" For="@(() => _currentCinema.Address)" />
+        <MudTextField Label="@Localizer["Name"]" @bind-Value="@_currentCinema.Name" For="@(() => _currentCinema.Name)" />
+        <MudTextField Label="@Localizer["Address"]" @bind-Value="@_currentCinema.Address" For="@(() => _currentCinema.Address)" />
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateCinemaAsync" Class="px-10">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateCinemaAsync" Class="px-10">@Localizer["Save"]</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -94,7 +95,7 @@
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't delete cinema, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["DeleteErrorMessage"], Severity.Error);
         }
     }
     private void AddCinema()
@@ -112,7 +113,7 @@
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't update cinema, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["UpdateErrorMessage"], Severity.Error);
         }
     }
     private void OpenUpdateCinemaDialog(int id)

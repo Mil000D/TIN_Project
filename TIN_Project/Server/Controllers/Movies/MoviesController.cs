@@ -19,10 +19,10 @@ namespace TIN_Project.Server.Controllers.Movies
             _movieMapper = movieMapper;
         }
         [HttpGet]
-        public async Task<IActionResult> GetMoviesAsync()
+        public async Task<IActionResult> GetMoviesAsync([FromQuery] string culture)
         {
             var movies = await _moviesDbService.GetMoviesAsync();
-            return Ok(_movieMapper.MapMoviesToGetMovieDTOs(movies));
+            return Ok(_movieMapper.MapMoviesToGetMovieDTOs(movies, culture));
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMovieAsync(int id)
@@ -38,13 +38,6 @@ namespace TIN_Project.Server.Controllers.Movies
             }
         }
 
-        [AllowAnonymous]
-        [HttpGet("repertoire/{idRepertoire}")]
-        public async Task<IActionResult> GetMoviesByRepertoireIdAsync(int idRepertoire)
-        {
-			var movies = await _moviesDbService.GetMoviesByRepertoireIdAsync(idRepertoire);
-			return Ok(_movieMapper.MapMoviesToGetMovieDTOs(movies));
-		}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovieAsync(int id)
         {

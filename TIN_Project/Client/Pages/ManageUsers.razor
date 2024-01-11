@@ -3,10 +3,11 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.ManageUsers.ManageUsers> Localizer
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
-        <MudText Align="Align.Center" Typo="Typo.h4">Manage Users</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h4">@Localizer["Manage Users"]</MudText>
         @if (_users == null)
         {
             <div class="d-flex justify-center">
@@ -16,30 +17,30 @@
         else if (_users.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Elevation="20" Severity="Severity.Info">No users</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">@Localizer["No users"]</MudAlert>
             </div>
         }
         else
         {
             <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_users" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
-                    <MudTh>Username</MudTh>
-                    <MudTh>Email</MudTh>
-                    <MudTh>Name</MudTh>
-                    <MudTh>Surname</MudTh>
-                    <MudTh>Birth date</MudTh>
-                    <MudTh>Is admin?</MudTh>
-                    <MudTh>Actions</MudTh>
+                    <MudTh>@Localizer["Username"]</MudTh>
+                    <MudTh>@Localizer["Email"]</MudTh>
+                    <MudTh>@Localizer["Name"]</MudTh>
+                    <MudTh>@Localizer["Surname"]</MudTh>
+                    <MudTh>@Localizer["Birth date"]</MudTh>
+                    <MudTh>@Localizer["Is admin?"]</MudTh>
+                    <MudTh>@Localizer["Actions"]</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Username">@context.Username</MudTd>
-                    <MudTd DataLabel="Email">@context.Email</MudTd>
-                    <MudTd DataLabel="Name">@context.Name</MudTd>
-                    <MudTd DataLabel="Surname">@context.Surname</MudTd>
-                    <MudTd DataLabel="Birth date">@context.BirthDate</MudTd>
-                    <MudTd DataLabel="Is admin?">@context.IsAdmin</MudTd>
-                    <MudTd DataLabel="Actions">
-                        <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteUserAsync(context.IdUser))>Delete</MudButton>
+                    <MudTd DataLabel="@Localizer["Username"]">@context.Username</MudTd>
+                    <MudTd DataLabel="@Localizer["Email"]">@context.Email</MudTd>
+                    <MudTd DataLabel="@Localizer["Name"]">@context.Name</MudTd>
+                    <MudTd DataLabel="@Localizer["Surname"]">@context.Surname</MudTd>
+                    <MudTd DataLabel="@Localizer["Birth date"]">@context.BirthDate</MudTd>
+                    <MudTd DataLabel="@Localizer["Is admin?"]">@Localizer[$"{@context.IsAdmin}"]</MudTd>
+                    <MudTd DataLabel="@Localizer["Actions"]">
+                        <MudButton Style="background-color: red; color: white;" @onclick=@(() => DeleteUserAsync(context.IdUser))>@Localizer["Delete"]</MudButton>
                     </MudTd>
                 </RowTemplate>
                 <PagerContent>
@@ -49,7 +50,7 @@
                 </PagerContent>
             </MudTable>
         }
-        <MudButton Style="background-color: #2196F3; color: white;" @onclick="AddAdmin">Add admin</MudButton>
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="AddAdmin">@Localizer["Add admin"]</MudButton>
     </MudStack>
 </MudContainer>
 
@@ -82,7 +83,7 @@
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't delete user, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["DeleteErrorMessage"], Severity.Error);
         }
     }
 }

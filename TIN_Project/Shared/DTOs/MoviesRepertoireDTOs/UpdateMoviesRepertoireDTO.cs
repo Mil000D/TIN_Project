@@ -7,7 +7,7 @@ namespace TIN_Project.Shared.DTOs.MoviesRepertoireDTOs
         public int IdMoviesRepertoire { get; set; }
         public int IdRepertoire { get; set; }
         public int IdMovie { get; set; }
-        [Required]
+        [Required(ErrorMessageResourceName = "ShowTimeRequiredError", ErrorMessageResourceType = typeof(Resources.MoviesRepertoireDTOsResources.MoviesRepertoire))]
         public TimeOnly ShowTime { get; set; }
     }
 }

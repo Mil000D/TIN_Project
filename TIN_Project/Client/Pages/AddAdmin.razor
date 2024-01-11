@@ -3,21 +3,23 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.AddAdmin.AddAdmin> Localizer
 
 <EditForm Model="@_addAdminDTO" OnValidSubmit="@HandleValidSubmitAsync">
     <DataAnnotationsValidator />
+    <MudText Align="Align.Center" Typo="Typo.h4" Class="mb-2">@Localizer["Add Admin"]</MudText>
     <MudCard Elevation="20" Style="min-width: 400px;">
         <MudCardContent>
-            <MudTextField Label="Username" @bind-Value="_addAdminDTO.Username" For="@(() => _addAdminDTO.Username)" />
-            <MudTextField Label="Password" @bind-Value="_addAdminDTO.Password" For="@(() => _addAdminDTO.Password)" InputType="InputType.Password"/>
-            <MudTextField Label="E-mail" @bind-Value="_addAdminDTO.Email" For="@(() => _addAdminDTO.Email)" />
-            <MudTextField Label="Name" @bind-Value="_addAdminDTO.Name" For="@(() => _addAdminDTO.Name)" />
-            <MudTextField Label="Surname" @bind-Value="_addAdminDTO.Surname" For="@(() => _addAdminDTO.Surname)" />
-            <MudDatePicker Label="Date of birth" @bind-Date="_addAdminDTO.BirthDate" For="@(() => _addAdminDTO.BirthDate)" />
+            <MudTextField Label="@Localizer["Username"]" @bind-Value="_addAdminDTO.Username" For="@(() => _addAdminDTO.Username)" />
+            <MudTextField Label="@Localizer["Password"]" @bind-Value="_addAdminDTO.Password" For="@(() => _addAdminDTO.Password)" InputType="InputType.Password"/>
+            <MudTextField Label="@Localizer["E-mail"]" @bind-Value="_addAdminDTO.Email" For="@(() => _addAdminDTO.Email)" />
+            <MudTextField Label="@Localizer["Name"]" @bind-Value="_addAdminDTO.Name" For="@(() => _addAdminDTO.Name)" />
+            <MudTextField Label="@Localizer["Surname"]" @bind-Value="_addAdminDTO.Surname" For="@(() => _addAdminDTO.Surname)" />
+            <MudDatePicker Label="@Localizer["Date of birth"]" @bind-Date="_addAdminDTO.BirthDate" For="@(() => _addAdminDTO.BirthDate)" />
             <MudText Color="Color.Error">@_errorMessage</MudText>
         </MudCardContent>
         <MudCardActions Class="justify-center">
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@Localizer["Add"]</MudButton>
         </MudCardActions>
     </MudCard>
 </EditForm>
@@ -34,12 +36,12 @@
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            _errorMessage = "Such username already exists, try again";
+            _errorMessage = Localizer["ErrorMessage1"];
             AlertService.DisplayAlert(_errorMessage, Severity.Error);
         }
         else
         {
-            _errorMessage = "Something went wrong, try again";
+            _errorMessage = Localizer["ErrorMessage2"];
             AlertService.DisplayAlert(_errorMessage, Severity.Error);
         }
     }

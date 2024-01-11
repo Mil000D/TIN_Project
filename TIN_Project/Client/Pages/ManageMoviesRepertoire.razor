@@ -3,10 +3,11 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
+@inject IStringLocalizer<Resources.ManageMoviesRepertoire.ManageMoviesRepertoire> Localizer
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
-        <MudText Align="Align.Center" Typo="Typo.h4">Manage Movies' Repertoires</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h4">@Localizer["Manage Movies' Repertoires"]</MudText>
         @if (_moviesrepertoires == null)
         {
             <div class="d-flex justify-center">
@@ -16,31 +17,31 @@
         else if (_moviesrepertoires.Count() == 0)
         {
             <div class="d-flex justify-center">
-                <MudAlert Elevation="20" Severity="Severity.Info">No movies' repertoires</MudAlert>
+                <MudAlert Elevation="20" Severity="Severity.Info">@Localizer["No movies' repertoires"]</MudAlert>
             </div>
         }
         else
         {
             <MudTable Style="min-width: 800px;" @ref="@_table" Items="@_moviesrepertoires" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
-                    <MudTh>Poster</MudTh>
-                    <MudTh>Title</MudTh>
-                    <MudTh>Date</MudTh>
-                    <MudTh>Show Time</MudTh>
-                    <MudTh>Cinema Name</MudTh>
-                    <MudTh>Cinema Address</MudTh>
-                    <MudTh>Actions</MudTh>
+                    <MudTh>@Localizer["Poster"]</MudTh>
+                    <MudTh>@Localizer["Title"]</MudTh>
+                    <MudTh>@Localizer["Date"]</MudTh>
+                    <MudTh>@Localizer["Show Time"]</MudTh>
+                    <MudTh>@Localizer["Cinema Name"]</MudTh>
+                    <MudTh>@Localizer["Cinema Address"]</MudTh>
+                    <MudTh>@Localizer["Actions"]</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Poster"><MudImage Src="@context.PosterUrl" Width="70" Height="100"></MudImage></MudTd>
-                    <MudTd DataLabel="Title">@context.Title</MudTd>
-                        <MudTd DataLabel="Date">@context.Date.Day.@context.Date.Month.@context.Date.Year</MudTd>
-                        <MudTd DataLabel="Show Time">@context.ShowTime</MudTd>
-                        <MudTd DataLabel="Cinema Name">@context.CinemaName</MudTd>
-                        <MudTd DataLabel="Cinema Address">@context.CinemaAddress</MudTd>
-                        <MudTd DataLabel="Actions">
-                            <MudButton Style="background-color: #2196F3; color: white;" @onclick ="@(() => OpenUpdateMoviesRepertoireDialog(context.IdMoviesRepertoire))">Update</MudButton>
-                            <MudButton Style="background-color: red; color: white;" @onclick =@(() => DeleteMoviesRepertoireAsync(context.IdMoviesRepertoire))>Delete</MudButton>
+                    <MudTd DataLabel="@Localizer["Poster"]"><MudImage Src="@context.PosterUrl" Width="70" Height="100"></MudImage></MudTd>
+                    <MudTd DataLabel="@Localizer["Title"]">@context.Title</MudTd>
+                        <MudTd DataLabel="@Localizer["Date"]">@context.Date.Day.@context.Date.Month.@context.Date.Year</MudTd>
+                        <MudTd DataLabel="@Localizer["Show Time"]">@context.ShowTime</MudTd>
+                        <MudTd DataLabel="@Localizer["Cinema Name"]">@context.CinemaName</MudTd>
+                        <MudTd DataLabel="@Localizer["Cinema Address"]">@context.CinemaAddress</MudTd>
+                        <MudTd DataLabel="@Localizer["Actions"]">
+                            <MudButton Style="background-color: #2196F3; color: white;" @onclick ="@(() => OpenUpdateMoviesRepertoireDialog(context.IdMoviesRepertoire))">@Localizer["Update"]</MudButton>
+                            <MudButton Style="background-color: red; color: white;" @onclick =@(() => DeleteMoviesRepertoireAsync(context.IdMoviesRepertoire))>@Localizer["Delete"]</MudButton>
                         </MudTd>
                     </RowTemplate>
                     <PagerContent>
@@ -50,19 +51,19 @@
                     </PagerContent>
                 </MudTable>
         }
-        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OpenAddMoviesRepertoireDialog">Add repertoire</MudButton>
+        <MudButton Style="background-color: #2196F3; color: white;" @onclick="OpenAddMoviesRepertoireDialog">@Localizer["Add movie's repertoire"]</MudButton>
     </MudStack>
 </MudContainer>
 
 <MudDialog @bind-IsVisible="_isAddMoviesRepertoireDialogVisible" Options="_dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Add movie's repertoire
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @Localizer["Add movie's repertoire"]
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTimePicker Label="Show time" Orientation="Orientation.Landscape" @bind-Time="_time" />
-        <MudSelect T="GetMovieDTO" Label="Movie" ToStringFunc="@converter" @bind-Value="_movie">
+        <MudTimePicker Label="@Localizer["Show Time"]" Orientation="Orientation.Landscape" @bind-Time="_time" />
+        <MudSelect T="GetMovieDTO" Label="@Localizer["Movie"]" ToStringFunc="@converter" @bind-Value="_movie">
             @foreach (var movie in _movies)
             {
                 <MudSelectItem Value="@movie">@movie.Title</MudSelectItem>
@@ -70,19 +71,19 @@
         </MudSelect>
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddMoviesRepertoireAsync" Class="px-10">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddMoviesRepertoireAsync" Class="px-10">@Localizer["Save"]</MudButton>
     </DialogActions>
 </MudDialog>
 
 <MudDialog @bind-IsVisible="_isUpdateMoviesRepertoireDialogVisible" Options="_dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Update movie's repertoire
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @Localizer["Update movie's repertoire"]
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTimePicker Label="Show time" Orientation="Orientation.Landscape" @bind-Time="_time" />
-        <MudSelect T="GetMovieDTO" Label="Movie" ToStringFunc="@converter" @bind-Value="_movie">
+        <MudTimePicker Label="@Localizer["Show Time"]" Orientation="Orientation.Landscape" @bind-Time="_time" />
+        <MudSelect T="GetMovieDTO" Label="@Localizer["Movie"]" ToStringFunc="@converter" @bind-Value="_movie">
             @foreach (var movie in _movies)
             {
                 <MudSelectItem Value="@movie">@movie.Title</MudSelectItem>
@@ -90,7 +91,7 @@
         </MudSelect>
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateMoviesRepertoireAsync" Class="px-10">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateMoviesRepertoireAsync" Class="px-10">@Localizer["Save"]</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -119,7 +120,8 @@
     }
     private async Task GetMoviesRepertoiresAsync()
     {
-        _movies = await HttpClient.GetFromJsonAsync<IEnumerable<GetMovieDTO>>("api/movies");
+        var culture = CultureInfo.CurrentCulture.Name;
+        _movies = await HttpClient.GetFromJsonAsync<IEnumerable<GetMovieDTO>>($"api/movies?culture={culture}");
         _moviesrepertoires = await HttpClient.GetFromJsonAsync<IEnumerable<GetMoviesRepertoireDTO>>($"api/moviesrepertoires?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}");
     }
 
@@ -154,11 +156,11 @@
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("Such movie's repertoire already exists, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ConflictErrorMessage"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't add movie's repertoire, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["AddErrorMessage"], Severity.Error);
         }
     }
     private async Task DeleteMoviesRepertoireAsync(int id)
@@ -170,7 +172,7 @@
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't delete movie's repertoire, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["DeleteErrorMessage"], Severity.Error);
         }
     }
 
@@ -187,11 +189,11 @@
         }
         else if(response.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            AlertService.DisplayAlert("Such movie's repertoire already exists, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["ConflictErrorMessage"], Severity.Error);
         }
         else
         {
-            AlertService.DisplayAlert("Couldn't update movie's repertoire, try again", Severity.Error);
+            AlertService.DisplayAlert(Localizer["UpdateErrorMessage"], Severity.Error);
         }
     }
     private Func<GetMovieDTO, string> converter = g => g?.Title;

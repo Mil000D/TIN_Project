@@ -3,6 +3,7 @@
 @inject HttpClient HttpClient
 @inject IAlertService AlertService
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<Resources.UpdateMovie.UpdateMovie> Localizer
 
 @if (_updateMovieDTO == null)
 {
@@ -14,16 +15,19 @@ else
 {
     <EditForm Model="@_updateMovieDTO" OnValidSubmit="@HandleValidSubmitAsync">
         <DataAnnotationsValidator />
+        <MudText Align="Align.Center" Typo="Typo.h4" Class="mb-2">@Localizer["Update Movie"]</MudText>
         <MudCard Elevation="20" Style="min-width: 400px;">
             <MudCardContent>
-                <MudTextField Label="Title" @bind-Value="_updateMovieDTO.Title" For="@(() => _updateMovieDTO.Title)" />
-                <MudTextField Label="Poster URL" @bind-Value="_updateMovieDTO.PosterUrl" For="@(() => _updateMovieDTO.PosterUrl)" />
-                <MudTextField Label="Trailer URL" @bind-Value="_updateMovieDTO.TrailerUrl" For="@(() => _updateMovieDTO.TrailerUrl)" />
-                <MudTextField Label="Description" @bind-Value="_updateMovieDTO.Description" For="@(() => _updateMovieDTO.Description)" Lines="4" />
-                <MudSelect T="GenreDTO" Label="Genres" ToStringFunc="@converter" MultiSelection="true" @bind-Value="_genre" @bind-SelectedValues="_genresToUpdate">
+                <MudTextField Label="@Localizer["TitleEN"]" @bind-Value="_updateMovieDTO.EnglishTitle" For="@(() => _updateMovieDTO.EnglishTitle)" />
+                <MudTextField Label="@Localizer["TitlePL"]" @bind-Value="_updateMovieDTO.PolishTitle" For="@(() => _updateMovieDTO.PolishTitle)" />
+                <MudTextField Label="@Localizer["Poster URL"]" @bind-Value="_updateMovieDTO.PosterUrl" For="@(() => _updateMovieDTO.PosterUrl)" />
+                <MudTextField Label="@Localizer["Trailer URL"]" @bind-Value="_updateMovieDTO.TrailerUrl" For="@(() => _updateMovieDTO.TrailerUrl)" />
+                <MudTextField Label="@Localizer["DescriptionEN"]" @bind-Value="_updateMovieDTO.EnglishDescription" For="@(() => _updateMovieDTO.EnglishDescription)" Lines="4" />
+                <MudTextField Label="@Localizer["DescriptionPL"]" @bind-Value="_updateMovieDTO.PolishDescription" For="@(() => _updateMovieDTO.PolishDescription)" Lines="4" />
+                <MudSelect T="GenreDTO" Label="@Localizer["Genres"]" ToStringFunc="@converter" MultiSelection="true" @bind-Value="_genre" @bind-SelectedValues="_genresToUpdate">
                     @foreach (var genre in _genres)
                     {
-                        <MudSelectItem Value="@genre">@genre.Name</MudSelectItem>
+                        <MudSelectItem Value="@genre">@(CultureInfo.CurrentCulture.Name == "en-US" ? genre.EnglishName : genre.PolishName)</MudSelectItem>
                     }
                 </MudSelect>
             </MudCardContent>
@@ -62,7 +66,7 @@ else
             AlertService.DisplayAlert("Couldn't update movie try again", Severity.Error);
         }
     }
-    private Func<GenreDTO, string> converter = g => g?.Name;
+    private Func<GenreDTO, string> converter = g => CultureInfo.CurrentCulture.Name == "en-US" ? g?.EnglishName : g?.PolishName;
 
 
 }

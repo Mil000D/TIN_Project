@@ -47,8 +47,10 @@ namespace TIN_Project.Server.Services.MoviesServices
 
         public async Task UpdateMovieAsync(Movie movieToUpdate, UpdateMovieDTO movieDTO)
         {
-            movieToUpdate.EnglishTitle = movieDTO.Title;
-            movieToUpdate.EnglishDescription = movieDTO.Description;
+            movieToUpdate.EnglishTitle = movieDTO.EnglishTitle;
+            movieToUpdate.PolishTitle = movieDTO.PolishTitle;
+            movieToUpdate.EnglishDescription = movieDTO.EnglishDescription;
+            movieToUpdate.PolishDescription = movieDTO.PolishDescription;
             movieToUpdate.TrailerUrl = movieDTO.TrailerUrl;
             movieToUpdate.PosterUrl = movieDTO.PosterUrl;
             foreach (var genre in _context.Genres)
