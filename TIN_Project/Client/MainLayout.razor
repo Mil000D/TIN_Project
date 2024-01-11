@@ -11,7 +11,8 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudSelect @ref="_select" ValueChanged="@((value) => OnCinemaChanged(value))" Style="max-width:200px; background-color:white;" T="GetCinemaDTO" Label="@Localizer["Cinemas"]" ToStringFunc="@converter" Value="Cinema" Variant="Variant.Filled" Margin="Margin.Dense">
+        <MudStack Row="true">
+        <MudSelect @ref="_select" ValueChanged="@((value) => OnCinemaChanged(value))" Style="max-width:200px; background-color:white;" T="GetCinemaDTO" Label="@Localizer["Cinemas"]" ToStringFunc="@converter" Value="@(NavigationManager.Uri.Contains("cinema-repertoire") ? Cinema : null)" Variant="Variant.Filled" Margin="Margin.Dense">
             @foreach (var cinema in Cinemas)
             {
                 <MudSelectItem Value="@cinema">@cinema.Name - @cinema.Address</MudSelectItem>
@@ -25,6 +26,7 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg" height="14" class="mr-1" /> @Localizer["English"]
             </MudSelectItem>
         </MudSelect>
+        </MudStack>
         <MudSpacer />
         <AuthorizeView>
             <NotAuthorized>
@@ -96,7 +98,6 @@
                 DrawerMiniWidthLeft = "72px",
             }
         };
-
     private MudThemeProvider mudThemeProvider = null!;
 
     private GetCinemaDTO Cinema { get; set; } = new GetCinemaDTO();

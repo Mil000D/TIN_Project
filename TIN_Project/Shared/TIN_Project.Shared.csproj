@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\CinemaDTOsResources\Cinema.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Cinema.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\GenreDTOsResources\Genre.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -39,6 +44,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\CinemaDTOsResources\Cinema.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Cinema.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\GenreDTOsResources\Genre.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Genre.Designer.cs</LastGenOutput>

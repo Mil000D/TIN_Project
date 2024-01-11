@@ -26,7 +26,7 @@ else
 					<MudText Typo="Typo.body2">@Localizer["Genres"] : @string.Join(", ", movie.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudText>
 				</MudCardContent>
 				<MudCardActions Style="min-height:100px;">
-					<MudContainer Class="gap-4 d-flex flex-wrap">
+					<MudContainer Class="gap-2 d-flex flex-wrap justify-center">
 						@foreach (var showTime in movie.ShowTimes)
 						{
 							<MudButton Style="background-color: #2196F3; color: white;" @onclick="@(() => NavigateToMovieDetails(movie.IdMovie, showTime))">@showTime</MudButton>

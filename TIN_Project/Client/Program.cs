@@ -21,7 +21,6 @@ builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 builder.Services.AddHttpClient("TIN_Project.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
-// Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("TIN_Project.ServerAPI"));
 
 builder.Services.AddBlazoredLocalStorage();

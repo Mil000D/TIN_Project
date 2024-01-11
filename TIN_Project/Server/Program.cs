@@ -19,6 +19,7 @@ using TIN_Project.Server.Services.MoviesRepertoiresServices;
 using TIN_Project.Server.Mappers.OrderMappers;
 using TIN_Project.Server.Services.OrdersServices;
 using TIN_Project.Shared.Base64Decoder;
+using TIN_Project.Server.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseTokenRefresh();
 
 app.MapRazorPages();
 app.MapControllers();

@@ -39,7 +39,7 @@ else
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudText Typo="Typo.h6">@Localizer["Show time"]</MudText>
-                            <MudText Typo="Typo.body2">@ShowTime @Movie.Date.ToLongDateString()</MudText>
+                            <MudText Typo="Typo.body2">@TimeOnly.Parse(ShowTime) @Movie.Date.ToLongDateString()</MudText>
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudText Typo="Typo.h6">@Localizer["Cinema address"]</MudText>
