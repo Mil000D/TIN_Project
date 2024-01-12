@@ -4,6 +4,7 @@
 @inject HttpClient HttpClient
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.ManageMovies.ManageMovies> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <MudContainer Class="d-flex justify-center" >
     <MudStack>
@@ -66,11 +67,13 @@
     }
     private async Task GetMoviesAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var culture = CultureInfo.CurrentCulture.Name;
         _movies = await HttpClient.GetFromJsonAsync<List<GetMovieDTO>>($"api/movies?culture={culture}");
     }
     private async Task DeleteMovieAsync(int id)
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.DeleteAsync($"api/movies/{id}");
         if (response.IsSuccessStatusCode)
         {

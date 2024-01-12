@@ -1,6 +1,7 @@
 ﻿@page "/cinema-repertoire/{IdCinema:int}/{CinemaName}"
 @inject HttpClient HttpClient
 @inject IStringLocalizer<Resources.CinemaRepertoire.CinemaRepertoire> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 @if (_repertoires == null)
 {
@@ -44,6 +45,7 @@ else
     }
     private async Task GetRepertoiresAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         _repertoires = await HttpClient.GetFromJsonAsync<List<GetRepertoireDTO>>($"api/repertoires/{IdCinema}");
         _repertoire = _repertoires.FirstOrDefault();
     }

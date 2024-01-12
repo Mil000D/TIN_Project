@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.AddAdmin.AddAdmin> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <EditForm Model="@_addAdminDTO" OnValidSubmit="@HandleValidSubmitAsync">
     <DataAnnotationsValidator />
@@ -29,6 +30,7 @@
     private string _errorMessage;
     private async Task HandleValidSubmitAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.PostAsJsonAsync("api/users/admin", _addAdminDTO);
         if (response.IsSuccessStatusCode)
         {

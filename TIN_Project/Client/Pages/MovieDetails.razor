@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.MovieDetails.MovieDetails> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 @if(Movie == null)
 {
@@ -86,6 +87,7 @@ else
     private GetMovieDetailsDTO? Movie { get; set; }
     private async Task GetMovieDetailsAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         Movie = await HttpClient.GetFromJsonAsync<GetMovieDetailsDTO>($"api/moviesrepertoires/details?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}&IdMovie={IdMovie}&culture={CultureInfo.CurrentCulture.Name}");
     }
 
@@ -104,6 +106,7 @@ else
             IdMovieRepertoire = Movie.IdMovieRepertoire,
             IsPaid = true
         };
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.PostAsJsonAsync($"api/orders", orderDTO);
         if(response.IsSuccessStatusCode)
         {
@@ -127,6 +130,7 @@ else
                 IdMovieRepertoire = Movie.IdMovieRepertoire,
                 IsPaid = false
             };
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.PostAsJsonAsync($"api/orders", orderDTO);
         if (response.IsSuccessStatusCode)
         {

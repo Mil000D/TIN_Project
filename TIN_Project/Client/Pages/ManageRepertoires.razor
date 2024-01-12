@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.ManageRepertoires.ManageRepertoires> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -102,6 +103,7 @@
 
     private async Task GetRepertoiresAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         _repertoires = await HttpClient.GetFromJsonAsync<List<GetRepertoireDTO>>($"api/repertoires/{IdCinema}");
     }
 
@@ -126,6 +128,7 @@
     private async Task AddRepertoireAsync()
     {
         _currentAddRepertoire.IdCinema = IdCinema;
+        await TokensRefreshHandler.RefreshTokensAsync();
         var responseHTTP = await HttpClient.PostAsJsonAsync($"/api/repertoires/{IdCinema}", _currentAddRepertoire);
         if (responseHTTP.IsSuccessStatusCode)
         {
@@ -144,6 +147,7 @@
 
     private async Task UpdateRepertoireAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/repertoires", _currentUpdateRepertoire);
         if (responseHTTP.IsSuccessStatusCode)
         {
@@ -161,6 +165,7 @@
     }
     private async Task DeleteRepertoireAsync(int id)
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.DeleteAsync($"api/repertoires/{id}");
         if (response.IsSuccessStatusCode)
         {

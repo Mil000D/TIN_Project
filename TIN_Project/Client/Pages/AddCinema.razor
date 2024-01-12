@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.AddCinema.AddCinema> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <EditForm Model="@_addCinemaDTO" OnValidSubmit="@HandleValidSubmitAsync">
     <DataAnnotationsValidator />
@@ -27,6 +28,7 @@
 
     private async Task HandleValidSubmitAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.PostAsJsonAsync("api/cinemas", _addCinemaDTO);
         if (response.IsSuccessStatusCode)
         {

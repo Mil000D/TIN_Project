@@ -3,6 +3,7 @@
 @inject HttpClient HttpClient
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.ManageGenres.ManageGenres> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -99,6 +100,7 @@
     }
     private async Task AddGenreAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var responseHTTP = await HttpClient.PostAsJsonAsync($"/api/genres", _currentGenre);
         if (responseHTTP.IsSuccessStatusCode)
         {
@@ -121,6 +123,7 @@
     }
     private async Task GetGenresAsync()     
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         _genres = await HttpClient.GetFromJsonAsync<List<GenreDTO>>("api/genres");
     }
     private void PageChanged(int i)
@@ -130,6 +133,7 @@
 
     private async Task DeleteGenreAsync(int id)
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var responseHTTP = await HttpClient.DeleteAsync($"/api/genres/{id}");
         if (responseHTTP.IsSuccessStatusCode)
         {

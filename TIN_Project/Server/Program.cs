@@ -19,7 +19,7 @@ using TIN_Project.Server.Services.MoviesRepertoiresServices;
 using TIN_Project.Server.Mappers.OrderMappers;
 using TIN_Project.Server.Services.OrdersServices;
 using TIN_Project.Shared.Base64Decoder;
-using TIN_Project.Server.Middlewares;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +43,7 @@ builder.Services.AddScoped<IOrderMapper, OrderMapper>();
 builder.Services.AddSingleton<IDecoder, TIN_Project.Shared.Base64Decoder.Decoder>();
 builder.Services.AddDbContext<MainDbContext>(options =>
 {
-	options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlite($"Data Source={Path.Combine(Directory.GetCurrentDirectory(), @"Database\database.db")}");
 });
 builder.Services.AddAuthentication(options =>
 {
@@ -63,7 +63,6 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.FromMinutes(2),
         ValidIssuer = "https://localhost:8888",
         ValidAudience = "https://localhost:8888",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["SecretKey"]))
@@ -83,6 +82,7 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -104,8 +104,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseTokenRefresh();
 
 app.MapRazorPages();
 app.MapControllers();

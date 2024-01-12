@@ -5,11 +5,11 @@ namespace TIN_Project.Shared.DTOs.CinemaDTOs
     public class UpdateCinemaDTO
     {
         public int IdCinema { get; set; }
-        [Required]
-        [MaxLength(30)]
+        [Required(ErrorMessageResourceName = "NameRequiredError", ErrorMessageResourceType = typeof(Resources.CinemaDTOsResources.Cinema))]
+        [MaxLength(30, ErrorMessageResourceName = "NameLengthError", ErrorMessageResourceType = typeof(Resources.CinemaDTOsResources.Cinema))]
         public string Name { get; set; }
-        [Required]
-        [MaxLength(40)]
+        [Required(ErrorMessageResourceName = "AddressRequiredError", ErrorMessageResourceType = typeof(Resources.CinemaDTOsResources.Cinema))]
+        [MaxLength(40, ErrorMessageResourceName = "AddressLengthError", ErrorMessageResourceType = typeof(Resources.CinemaDTOsResources.Cinema))]
         public string Address { get; set; }
     }
 }

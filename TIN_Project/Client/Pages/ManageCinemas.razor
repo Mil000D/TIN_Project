@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.ManageCinemas.ManageCinemas> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -83,10 +84,12 @@
     }
     private async Task GetCinemasAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         _cinemas = await HttpClient.GetFromJsonAsync<List<GetCinemaDTO>>("api/cinemas");
     }
     private async Task DeleteCinemaAsync(int id)
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.DeleteAsync($"api/cinemas/{id}");
         if (response.IsSuccessStatusCode)
         {
@@ -104,6 +107,7 @@
     }
     private async Task UpdateCinemaAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var responseHTTP = await HttpClient.PutAsJsonAsync($"/api/cinemas", _currentCinema);
         if (responseHTTP.IsSuccessStatusCode)
         {

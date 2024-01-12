@@ -70,6 +70,23 @@ namespace TIN_Project.Server.Controllers.Authentication
                 return Ok();
             }
         }
+        [Authorize(Roles = "Admin, Customer")]
+        [HttpGet("refresh")]
+        public async Task<IActionResult> RefreshTokens()
+        {
+            Request.Cookies.TryGetValue("refreshToken", out string? refreshToken);
+            var user = await _userDbService.GetUserByPredicateAsync(x => x.RefreshToken == refreshToken && x.RefreshTokenExpirationDate >= DateTime.Now);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                var httpResponse = Response;
+                await _tokenManager.GenerateTokensAsync(user, httpResponse);
+                return Ok();
+            }
+        }
 
         [Authorize(Roles = "Admin, Customer")]
         [HttpPost("logout")]

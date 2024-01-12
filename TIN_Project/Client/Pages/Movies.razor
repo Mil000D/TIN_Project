@@ -1,6 +1,7 @@
 ﻿@inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Resources.Movies.Movies> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 @if (_movies == null)
 {
@@ -54,6 +55,7 @@ else
     }
 	private async Task GetMoviesAsync()
     {
+		await TokensRefreshHandler.RefreshTokensAsync();
         _movies = await HttpClient.GetFromJsonAsync<List<GetMovieWithShowTimesDTO>>($"api/moviesrepertoires/showtimes/{IdRepertoire}?culture={CultureInfo.CurrentCulture.Name}");
     }
 	private void NavigateToMovieDetails(int idMovie, TimeOnly showTime)

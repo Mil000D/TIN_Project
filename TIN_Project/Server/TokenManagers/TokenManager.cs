@@ -42,7 +42,7 @@ namespace TIN_Project.Server.TokenManagers
                 issuer: "https://localhost:8888",
                 audience: "https://localhost:8888",
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(10),
+                expires: DateTime.Now.AddSeconds(20),
                 signingCredentials: credentials
             );
             var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
@@ -54,7 +54,7 @@ namespace TIN_Project.Server.TokenManagers
             httpResponse.Cookies.Append("payload", payload, new CookieOptions
             {
                 HttpOnly = false,
-                Expires = DateTime.Now.AddMinutes(10),
+                Expires = DateTime.Now.AddSeconds(20),
                 Secure = true,
                 IsEssential = true,
                 SameSite = SameSiteMode.Strict
@@ -62,7 +62,7 @@ namespace TIN_Project.Server.TokenManagers
             httpResponse.Cookies.Append("headerAndSignature", headerAndSignature, new CookieOptions
             {
                 HttpOnly = true,
-                Expires = DateTime.Now.AddMinutes(10),
+                Expires = DateTime.Now.AddSeconds(20),
                 Secure = true,
                 IsEssential = true,
                 SameSite = SameSiteMode.Strict

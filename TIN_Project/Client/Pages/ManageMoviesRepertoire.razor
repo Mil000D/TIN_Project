@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.ManageMoviesRepertoire.ManageMoviesRepertoire> Localizer
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <MudContainer Class="d-flex justify-center">
     <MudStack>
@@ -120,6 +121,7 @@
     }
     private async Task GetMoviesRepertoiresAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var culture = CultureInfo.CurrentCulture.Name;
         _movies = await HttpClient.GetFromJsonAsync<IEnumerable<GetMovieDTO>>($"api/movies?culture={culture}");
         _moviesrepertoires = await HttpClient.GetFromJsonAsync<IEnumerable<GetMoviesRepertoireDTO>>($"api/moviesrepertoires?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}");
@@ -148,6 +150,7 @@
         _addMoviesRepertoireDTO.IdRepertoire = IdRepertoire;
         _addMoviesRepertoireDTO.IdMovie = _movie.IdMovie;
         _addMoviesRepertoireDTO.ShowTime = TimeOnly.FromTimeSpan((TimeSpan)_time);
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.PostAsJsonAsync("api/moviesrepertoires", _addMoviesRepertoireDTO);
         if (response.IsSuccessStatusCode)
         {
@@ -165,6 +168,7 @@
     }
     private async Task DeleteMoviesRepertoireAsync(int id)
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.DeleteAsync($"api/moviesrepertoires/{id}");
         if (response.IsSuccessStatusCode)
         {
@@ -181,6 +185,7 @@
         _updateMoviesRepertoireDTO.IdMovie = _movie.IdMovie;
         _updateMoviesRepertoireDTO.IdRepertoire = IdRepertoire;
         _updateMoviesRepertoireDTO.ShowTime = TimeOnly.FromTimeSpan((TimeSpan)_time);
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.PutAsJsonAsync($"api/moviesrepertoires", _updateMoviesRepertoireDTO);
         if (response.IsSuccessStatusCode)
         {

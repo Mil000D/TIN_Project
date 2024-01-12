@@ -22,7 +22,6 @@ namespace TIN_Project.Server.Context
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.ApplyConfigurationsFromAssembly(typeof(MainDbContext).Assembly);
-			
 		}
 	}
 }

@@ -4,6 +4,7 @@
 @inject IAlertService AlertService
 @inject IStringLocalizer<Resources.AddMovie.AddMovie> Localizer
 @inject NavigationManager NavigationManager
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <EditForm Model="@_addMovieDTO" OnValidSubmit="@HandleValidSubmitAsync">
     <DataAnnotationsValidator />
@@ -37,10 +38,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         _genres = await HttpClient.GetFromJsonAsync<IEnumerable<GenreDTO>>("api/genres");
     }
     private async Task HandleValidSubmitAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         _addMovieDTO.Genres = _genresToUpdate.ToList();
         var response = await HttpClient.PostAsJsonAsync("api/movies", _addMovieDTO);
         if (response.IsSuccessStatusCode)

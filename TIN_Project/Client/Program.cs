@@ -19,6 +19,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddSingleton<IDecoder, Decoder>();
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+builder.Services.AddScoped<ITokensRefreshHandler, TokensRefreshHandler>();
 builder.Services.AddHttpClient("TIN_Project.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("TIN_Project.ServerAPI"));

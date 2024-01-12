@@ -4,6 +4,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IStringLocalizer<Resources.MainLayout.MainLayout> Localizer
 @inject ILocalStorageService LocalStorageService
+@inject ITokensRefreshHandler TokensRefreshHandler
 
 <MudThemeProvider @ref="@mudThemeProvider" Theme="myCustomTheme" />
 <MudDialogProvider />
@@ -110,6 +111,7 @@
 
     private async Task GetCinemasAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         Cinemas = await HttpClient.GetFromJsonAsync<List<GetCinemaDTO>>("api/cinemas");
         Cinema = Cinemas.FirstOrDefault();
     }
