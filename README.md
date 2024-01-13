@@ -33,7 +33,7 @@ The Cinema Manager Web Application supports multiple languages to enhance user e
 
 ### Prerequisites
 
-- [.NET SDK](https://dotnet.microsoft.com/download) must be installed.
+- .NET SDK must be installed. Follow this link to start downloading [.NET SDK 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-7.0.405-windows-x64-installer)
 - To seed database by yourself you need to have Entity Framework Core tools installed. To do it, go to CLI like cmd and use command : `dotnet tool install --global dotnet-ef` to install the tool.
 - A supported IDE, such as Visual Studio or Rider, is recommended.
 
