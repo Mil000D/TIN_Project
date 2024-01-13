@@ -11,9 +11,9 @@ namespace TIN_Project.Server.Services.OrdersServices
         {
             _context = context;
         }
-        public async Task<Order?> GetOrderByMovieRepertoireIdAsync(int idMovieRepertoire)
+        public async Task<Order?> GetOrderByMovieRepertoireIdAsync(int idMovieRepertoire, int idUser)
         {
-            return await _context.Orders.FirstOrDefaultAsync(o => o.IdMovieRepertoire == idMovieRepertoire);
+            return await _context.Orders.FirstOrDefaultAsync(o => o.IdMovieRepertoire == idMovieRepertoire && o.IdUser == idUser);
         }
         public async Task AddOrderAsync(Order order)
         {

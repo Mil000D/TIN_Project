@@ -54,7 +54,7 @@ namespace TIN_Project.Server.TokenManagers
             httpResponse.Cookies.Append("payload", payload, new CookieOptions
             {
                 HttpOnly = false,
-                Expires = DateTime.Now.AddSeconds(20),
+                Expires = DateTime.Now.AddMinutes(20),
                 Secure = true,
                 IsEssential = true,
                 SameSite = SameSiteMode.Strict

@@ -61,6 +61,15 @@ namespace TIN_Project.Client.Resources.Profile {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to at.
+        /// </summary>
+        internal static string At {
+            get {
+                return ResourceManager.GetString("At", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change password.
         /// </summary>
         internal static string Change_password {

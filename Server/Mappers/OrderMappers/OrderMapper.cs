@@ -14,7 +14,7 @@ namespace TIN_Project.Server.Mappers.OrderMappers
                 IsPaid = addOrderDTO.IsPaid
             };
         }
-        public List<GetOrderDTO> MapToGetOrderDTOs(List<Order> orders, List<Movie> movies, List<MovieRepertoire> movieRepertoires, List<Cinema> cinemas, List<Repertoire> repertoires)
+        public List<GetOrderDTO> MapToGetOrderDTOs(List<Order> orders, List<Movie> movies, List<MovieRepertoire> movieRepertoires, List<Cinema> cinemas, List<Repertoire> repertoires, string culture)
         {
             List<GetOrderDTO> getOrderDTOs = new List<GetOrderDTO>();
             foreach (Order order in orders)
@@ -27,7 +27,7 @@ namespace TIN_Project.Server.Mappers.OrderMappers
                 {
                     IdMovieRepertoire = order.IdMovieRepertoire,
                     MoviePosterUrl = movie.PosterUrl,
-                    MovieTitle = movie.EnglishTitle,
+                    MovieTitle = culture == "en-US" ? movie.EnglishTitle : movie.PolishTitle,
                     CinemaName = cinema.Name,
                     CinemaAddress = cinema.Address,
                     ShowDate = repertoire.Date,

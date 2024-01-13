@@ -39,7 +39,7 @@ namespace TIN_Project.Server.Controllers.Orders
             _decoder = decoder;
         }
         [HttpGet("{page}")]
-        public async Task<IActionResult> GetOrdersAsync(int page)
+        public async Task<IActionResult> GetOrdersAsync(int page, [FromQuery] string culture)
         {
             Request.Cookies.TryGetValue("payload", out var token);
             var tokenString = _decoder.DecodeBase64Url(token);
@@ -50,7 +50,7 @@ namespace TIN_Project.Server.Controllers.Orders
             var movies = await _moviesDbService.GetMoviesByMoviesRepertoiresAsync(moviesRepertoires);
             var repertoires = await _repertoiresDbService.GetRepertoiresByMoviesRepertoiresAsync(moviesRepertoires);
             var cinemas = await _cinemasDbService.GetCinemasByRepertoiresAsync(repertoires);
-            var getOrderDTOs = _orderMapper.MapToGetOrderDTOs(orders, movies, moviesRepertoires, cinemas, repertoires);
+            var getOrderDTOs = _orderMapper.MapToGetOrderDTOs(orders, movies, moviesRepertoires, cinemas, repertoires, culture);
             int pageSize = 2;
             var paginatedOrderDTOs = getOrderDTOs.Skip(page * pageSize)
                                                   .Take(pageSize)
@@ -73,7 +73,8 @@ namespace TIN_Project.Server.Controllers.Orders
             Request.Cookies.TryGetValue("payload", out var token);
             var tokenString = _decoder.DecodeBase64Url(token);
             var username = _decoder.GetUsernameFromToken(tokenString);
-            var order = await _ordersDbService.GetOrderByMovieRepertoireIdAsync(idMovieRepertoire);
+            var user = await _usersDbService.GetUserByPredicateAsync(x => x.Username == username);
+            var order = await _ordersDbService.GetOrderByMovieRepertoireIdAsync(idMovieRepertoire, user.IdUser);
             if (order == null)
             {
                 return NotFound();
@@ -90,14 +91,14 @@ namespace TIN_Project.Server.Controllers.Orders
             Request.Cookies.TryGetValue("payload", out var token);
             var tokenString = _decoder.DecodeBase64Url(token);
             var username = _decoder.GetUsernameFromToken(tokenString);
-            var order = await _ordersDbService.GetOrderByMovieRepertoireIdAsync(addOrderDTO.IdMovieRepertoire);
+            var user = await _usersDbService.GetUserByPredicateAsync(x => x.Username == username);
+            var order = await _ordersDbService.GetOrderByMovieRepertoireIdAsync(addOrderDTO.IdMovieRepertoire, user.IdUser);
             if(order != null)
             {
                 return Conflict();
             }
             else
             {
-                var user = await _usersDbService.GetUserByPredicateAsync(x => x.Username == username);
                 var newOrder = _orderMapper.MapAddOrderDTOToOrder(addOrderDTO, user.IdUser);
                 await _ordersDbService.AddOrderAsync(newOrder);
                 return Ok();

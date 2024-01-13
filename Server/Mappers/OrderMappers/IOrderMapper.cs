@@ -6,6 +6,6 @@ namespace TIN_Project.Server.Mappers.OrderMappers
     public interface IOrderMapper
     {
         public Order MapAddOrderDTOToOrder(AddOrderDTO addOrderDTO, int idUser);
-        public List<GetOrderDTO> MapToGetOrderDTOs(List<Order> orders, List<Movie> movies, List<MovieRepertoire> movieRepertoires, List<Cinema> cinemas, List<Repertoire> repertoires);
+        public List<GetOrderDTO> MapToGetOrderDTOs(List<Order> orders, List<Movie> movies, List<MovieRepertoire> movieRepertoires, List<Cinema> cinemas, List<Repertoire> repertoires, string culture);
     }
 }

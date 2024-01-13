@@ -127,6 +127,7 @@
 
     private async Task OnLogoutClickAsync()
     {
+        await TokensRefreshHandler.RefreshTokensAsync();
         var response = await HttpClient.PostAsync("api/authentication/logout", null);
 
         if (response.IsSuccessStatusCode)

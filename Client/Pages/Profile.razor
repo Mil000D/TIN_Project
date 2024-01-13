@@ -77,7 +77,7 @@ else
                                 <MudImage Src="@order.MoviePosterUrl" Height="300"/>
                                     <MudStack>
                                         <MudText Class="mt-2" Typo="Typo.h4">@order.MovieTitle</MudText>
-                                        <MudText Typo="Typo.h5">@order.ShowDate.DayOfWeek @order.ShowDate.Day.@order.ShowDate.Month.@order.ShowDate.Year at @order.ShowTime</MudText>
+                                        <MudText Typo="Typo.h5">@order.ShowDate.ToLongDateString() @Localizer["At"] @order.ShowTime</MudText>
                                         <MudText Typo="Typo.h6">@order.CinemaName - @order.CinemaAddress</MudText>
                                         @if (!order.IsPaid)
                                         {
@@ -143,7 +143,7 @@ else
         if (user.IsInRole("Customer"))
         {
             _count = await HttpClient.GetFromJsonAsync<int>("api/orders/count");
-            _orders = await HttpClient.GetFromJsonAsync<List<GetOrderDTO>>($"api/orders/{_selected}");
+            _orders = await HttpClient.GetFromJsonAsync<List<GetOrderDTO>>($"api/orders/{_selected}?culture={CultureInfo.CurrentCulture.Name}");
         }
     }
     private async Task OnPageChanged(int i)
@@ -202,7 +202,7 @@ else
         var response = await HttpClient.PutAsync($"api/orders/{idMovieRepertoire}", null);
 		if (response.IsSuccessStatusCode)
 		{
-            _orders = await HttpClient.GetFromJsonAsync<List<GetOrderDTO>>($"api/orders/{_selected}");
+            _orders = await HttpClient.GetFromJsonAsync<List<GetOrderDTO>>($"api/orders/{_selected}?culture={CultureInfo.CurrentCulture.Name}");
             AlertService.DisplayAlert(Localizer["PaymentSuccessful"], Severity.Success);
 		}
 		else
