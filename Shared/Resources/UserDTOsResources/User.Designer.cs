@@ -70,7 +70,7 @@ namespace TIN_Project.Shared.Resources.UserDTOsResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The E-mail field doesn&apos;t contain valid e-mail address..
+        ///   Looks up a localized string similar to The E-mail field doesn&apos;t contain valid e-mail address.
         /// </summary>
         internal static string EmailAddressError {
             get {

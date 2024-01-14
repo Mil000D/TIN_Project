@@ -121,7 +121,7 @@
     <value>Date of birth is required</value>
   </data>
   <data name="EmailAddressError" xml:space="preserve">
-    <value>The E-mail field doesn't contain valid e-mail address.</value>
+    <value>The E-mail field doesn't contain valid e-mail address</value>
   </data>
   <data name="EmailLengthError" xml:space="preserve">
     <value>E-mail must be string, max 30 chars</value>

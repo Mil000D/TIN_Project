@@ -12,14 +12,14 @@ namespace TIN_Project.Server.Mappers.MoviesRepertoireMappers
         {
             _genreMapper = genreMapper;
         }
-        public List<GetMoviesRepertoireDTO> MapToGetMoviesRepertoireDTO(Cinema cinema, List<Movie> movies, Repertoire repertoire, List<MovieRepertoire> movieRepertoirs)
+        public List<GetMoviesRepertoireDTO> MapToGetMoviesRepertoireDTO(Cinema cinema, List<Movie> movies, Repertoire repertoire, List<MovieRepertoire> movieRepertoirs, string culture)
         {
             return movieRepertoirs.Select(movieRepertoire => new GetMoviesRepertoireDTO
             {
                 IdMoviesRepertoire = movieRepertoire.IdMovieRepertoire,
                 IdMovie = movieRepertoire.IdMovie,
                 PosterUrl = movies.Where(movie => movie.IdMovie == movieRepertoire.IdMovie).Select(movie => movie.PosterUrl).FirstOrDefault(),
-                Title = movies.Where(movie => movie.IdMovie == movieRepertoire.IdMovie).Select(movie => movie.EnglishTitle).FirstOrDefault(),
+                Title = movies.Where(movie => movie.IdMovie == movieRepertoire.IdMovie).Select(movie => culture == "en-US" ? movie.EnglishTitle : movie.PolishTitle).FirstOrDefault(),
                 Date = repertoire.Date.ToDateTime(TimeOnly.Parse("0:00")),
                 ShowTime = movieRepertoire.ShowTime,
                 CinemaName = cinema.Name,

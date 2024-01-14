@@ -28,7 +28,7 @@ namespace TIN_Project.Server.Controllers.MoviesRepertoires
             _moviesRepertoireMapper = moviesRepertoireMapper;
         }
         [HttpGet]
-        public async Task<IActionResult> GetMoviesRepertoiresAsync([FromQuery] int IdCinema, [FromQuery] int IdRepertoire)
+        public async Task<IActionResult> GetMoviesRepertoiresAsync([FromQuery] int IdCinema, [FromQuery] int IdRepertoire, [FromQuery] string culture)
         {
             var cinema = await _cinemasDbService.GetCinemaByIdAsync(IdCinema);
             var movies = await _repertoiresDbService.GetMoviesFromRepertoireAsync(IdRepertoire);
@@ -40,7 +40,7 @@ namespace TIN_Project.Server.Controllers.MoviesRepertoires
             }
             else
             {
-                return Ok(_moviesRepertoireMapper.MapToGetMoviesRepertoireDTO(cinema, movies, repertoire, moviesRepertoires));
+                return Ok(_moviesRepertoireMapper.MapToGetMoviesRepertoireDTO(cinema, movies, repertoire, moviesRepertoires, culture));
             }
         }
         [AllowAnonymous]

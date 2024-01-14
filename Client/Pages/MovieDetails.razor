@@ -5,7 +5,7 @@
 @inject IStringLocalizer<Resources.MovieDetails.MovieDetails> Localizer
 @inject ITokensRefreshHandler TokensRefreshHandler
 
-@if(Movie == null)
+@if(_movie == null)
 {
     <MudProgressCircular Indeterminate="true" />
 }
@@ -16,21 +16,24 @@ else
             <MudItem xs="12" sm="6" md="4" lg="3">
                 <MudCard Elevation="20">
                     <MudCardContent Class="justify-center">
-                        <MudText Typo="Typo.h4">@Movie.Title</MudText>
-                        <MudCardMedia Class="mt-2" Image="@Movie.PosterUrl" Height="400" />
+                        <MudText Typo="Typo.h4">@_movie.Title</MudText>
+                        <MudCardMedia Class="mt-2" Image="@_movie.PosterUrl" Height="400" />
                     </MudCardContent>
                 </MudCard>
             </MudItem>
             <MudItem xs="12" sm="6" md="8" lg="9">
                 <MudCard Elevation="20">
                     <MudCardContent>
-                        <div class="pa-2" style="border-radius: 2px; outline:1px solid #2196F3;">
-                            <MudText Typo="Typo.h6">@Localizer["Genres"]</MudText>
-                            <MudText Typo="Typo.body2">@string.Join(", ", Movie.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudText>
-                        </div>
+                        @if (_movie.Genres != null && _movie.Genres.Count > 0)
+                        {
+                            <div class="pa-2" style="border-radius: 2px; outline:1px solid #2196F3;">
+                                <MudText Typo="Typo.h6">@Localizer["Genres"]</MudText>
+                                <MudText Typo="Typo.body2">@string.Join(", ", _movie.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudText>
+                            </div>
+                        }
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudText Typo="Typo.h6">@Localizer["Description"]</MudText>
-                            <MudText Typo="Typo.body2">@Movie.Description</MudText>
+                            <MudText Typo="Typo.body2">@_movie.Description</MudText>
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudStack Row="true" Class="align-center">
@@ -40,11 +43,11 @@ else
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudText Typo="Typo.h6">@Localizer["Show time"]</MudText>
-                            <MudText Typo="Typo.body2">@TimeOnly.Parse(ShowTime) @Movie.Date.ToLongDateString()</MudText>
+                            <MudText Typo="Typo.body2">@TimeOnly.Parse(ShowTime) @_movie.Date.ToLongDateString()</MudText>
                         </div>
                         <div class="pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
                             <MudText Typo="Typo.h6">@Localizer["Cinema address"]</MudText>
-                            <MudText Typo="Typo.body2">@Movie.CinemaName - @Movie.CinemaAddress</MudText>
+                            <MudText Typo="Typo.body2">@_movie.CinemaName - @_movie.CinemaAddress</MudText>
                         </div>
                         <AuthorizeView Roles="Customer">
                             <div class="d-flex justify-center pa-2 mt-2" style="border-radius: 2px; outline:1px solid #2196F3;">
@@ -62,7 +65,7 @@ else
 }
 =
 <MudDialog @bind-IsVisible="_isTrailerDialogVisible" Options="_dialogOptions">
-    <TitleContent>@Localizer["Trailer"] @Movie?.Title</TitleContent>
+    <TitleContent>@Localizer["Trailer"] @_movie?.Title</TitleContent>
     <DialogContent>
         <div style="width:900px;height:500px;">
             <iframe src="@GetVideoEmbeddedLink()" allowfullscreen></iframe>
@@ -80,20 +83,21 @@ else
     public string ShowTime { get; set; }
     private bool _isTrailerDialogVisible = false;
     private DialogOptions _dialogOptions = new() { FullWidth=true, MaxWidth=MaxWidth.Medium };
+    private GetMovieDetailsDTO? _movie;
+
     protected override async Task OnInitializedAsync()
     {
         await GetMovieDetailsAsync();
     }
-    private GetMovieDetailsDTO? Movie { get; set; }
     private async Task GetMovieDetailsAsync()
     {
         await TokensRefreshHandler.RefreshTokensAsync();
-        Movie = await HttpClient.GetFromJsonAsync<GetMovieDetailsDTO>($"api/moviesrepertoires/details?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}&IdMovie={IdMovie}&culture={CultureInfo.CurrentCulture.Name}");
+        _movie = await HttpClient.GetFromJsonAsync<GetMovieDetailsDTO>($"api/moviesrepertoires/details?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}&IdMovie={IdMovie}&culture={CultureInfo.CurrentCulture.Name}");
     }
 
     private string GetVideoEmbeddedLink()
     {
-        var uri = new Uri(Movie.TrailerUrl);
+        var uri = new Uri(_movie.TrailerUrl);
         var query = HttpUtility.ParseQueryString(uri.Query);
         var videoId = query["v"];
         return $"https://www.youtube.com/embed/{videoId}";
@@ -103,7 +107,7 @@ else
     {
         var orderDTO = new AddOrderDTO
         {
-            IdMovieRepertoire = Movie.IdMovieRepertoire,
+            IdMovieRepertoire = _movie.IdMovieRepertoire,
             IsPaid = true
         };
         await TokensRefreshHandler.RefreshTokensAsync();
@@ -127,7 +131,7 @@ else
 	{
         var orderDTO = new AddOrderDTO
             {
-                IdMovieRepertoire = Movie.IdMovieRepertoire,
+                IdMovieRepertoire = _movie.IdMovieRepertoire,
                 IsPaid = false
             };
         await TokensRefreshHandler.RefreshTokensAsync();

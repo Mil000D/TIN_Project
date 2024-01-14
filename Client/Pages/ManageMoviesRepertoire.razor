@@ -124,7 +124,7 @@
         await TokensRefreshHandler.RefreshTokensAsync();
         var culture = CultureInfo.CurrentCulture.Name;
         _movies = await HttpClient.GetFromJsonAsync<IEnumerable<GetMovieDTO>>($"api/movies?culture={culture}");
-        _moviesrepertoires = await HttpClient.GetFromJsonAsync<IEnumerable<GetMoviesRepertoireDTO>>($"api/moviesrepertoires?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}");
+        _moviesrepertoires = await HttpClient.GetFromJsonAsync<IEnumerable<GetMoviesRepertoireDTO>>($"api/moviesrepertoires?IdCinema={IdCinema}&IdRepertoire={IdRepertoire}&culture={CultureInfo.CurrentCulture.Name}");
     }
 
     private void OpenAddMoviesRepertoireDialog()

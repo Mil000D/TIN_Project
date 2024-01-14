@@ -57,13 +57,7 @@ else
     </MudStack>
     </MudContainer>
     <AuthorizeView Roles="Customer">
-	    @if(_orders.Count == 0)
-	    {
-            <div class="d-flex justify-center">
-                <MudProgressCircular Indeterminate="true" />
-            </div>
-	    }
-        else
+	    @if(_orders.Count != 0)
         {
             <MudStack>
                 <MudPaper Elevation="20" Class="pa-2 mb-2 mt-2 d-flex justify-center">
@@ -74,7 +68,7 @@ else
                     {
                         <MudPaper Elevation="20" Style="max-width:600px;" Class="pr-4">
                             <MudStack Row="true">
-                                <MudImage Src="@order.MoviePosterUrl" Height="300"/>
+                                <MudImage Src="@order.MoviePosterUrl" Height="350"/>
                                     <MudStack>
                                         <MudText Class="mt-2" Typo="Typo.h4">@order.MovieTitle</MudText>
                                         <MudText Typo="Typo.h5">@order.ShowDate.ToLongDateString() @Localizer["At"] @order.ShowTime</MudText>

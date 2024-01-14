@@ -24,7 +24,10 @@ else
 				<MudCardMedia Image="@movie.PosterUrl" Height="400" />
 				<MudCardContent Style="min-height:150px;">
 					<MudText Typo="Typo.h6">@movie.Title</MudText>
-					<MudText Typo="Typo.body2">@Localizer["Genres"] : @string.Join(", ", movie.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudText>
+					@if (movie.Genres != null && movie.Genres.Count > 0)
+					{
+						<MudText Typo="Typo.body2">@Localizer["Genres"] : @string.Join(", ", movie.Genres.Select(elem => CultureInfo.CurrentCulture.Name == "en-US" ? elem.EnglishName : elem.PolishName))</MudText>
+					}
 				</MudCardContent>
 				<MudCardActions Style="min-height:100px;">
 					<MudContainer Class="gap-2 d-flex flex-wrap justify-center">
