@@ -14,7 +14,7 @@ The Cinema Manager Web Application supports multiple languages to enhance user e
 
 ### For Customers
 - **Ticket Booking and Purchase:** Users have the ability to book or buy tickets for their preferred movies seamlessly.
-- **Account Management:** Users can manage their accounts, update personal information, and view their order history.
+- **Account Management:** Users can manage their accounts, update personal information, and view their order history (if user bought/booked a ticket, it appears under his profile details).
 
 ### For Admins
 
